@@ -1,2 +1,2 @@
-<b>Prueba de conexión Telegram</b>
-Configuración inicial del Comité de Inversión IA. Si ves este mensaje, el workflow de GitHub Actions funciona correctamente.
+<b>[PRUEBA DE INFRAESTRUCTURA]</b>
+Tercer intento tras instalar la GitHub App en la organizacion. Si ves este mensaje, el pipeline completo funciona de extremo a extremo.
