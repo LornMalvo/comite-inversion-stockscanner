@@ -1,0 +1,728 @@
+"""Constantes globales de StockScanner.
+
+Todo "número mágico" (pesos, umbrales, colores, TTL) vive aquí para que los
+módulos de cálculo sean auditables sin tocar la lógica. Cada decisión no obvia
+lleva su porqué al lado, como pide el protocolo del proyecto.
+"""
+
+APP_NOMBRE = "StockScanner"
+APP_CLAIM = "Tu análisis del mercado"
+
+# Se guarda junto a cada análisis persistido. Si cambia un peso o un umbral
+# de cualquier motor, se sube la versión: así el backtesting sabe qué
+# parámetros produjeron cada señal pasada y puede reconstruirla.
+MOTOR_VERSION = "0.3.0"   # 0.3.0: revisiones de analistas en Timing (pesos retocados), referencias por
+#                            comparables reales, P/B financieras, P/FFO REITs, consenso desde 2 analistas
+
+# ---------------------------------------------------------------- paleta ----
+C_PRIMARIO = "#004e64"
+C_AZUL = "#0056a2"
+C_VERDE = "#10b981"
+C_VERDE_OSCURO = "#065f46"
+C_TEAL = "#25a18e"
+C_AMBAR = "#ffcb77"
+C_NARANJA = "#f97316"
+C_ROJO = "#dc2626"
+C_ROJO_OSCURO = "#7f1d1d"
+C_FONDO = "#f8fafc"
+C_SUPERFICIE = "#ffffff"
+C_TEXTO = "#0f172a"
+C_TEXTO_TENUE = "#64748b"
+C_BORDE = "#e2e8f0"
+C_NAVBAR_FONDO = "#f1f5f9"
+
+# ------------------------------------------------------------ navegación ----
+SECCIONES = [
+    "Análisis Individual",
+    "Rastreador",
+    "Gestión de Cartera",
+    "Paper Trading",
+    "Favoritos",
+]
+ICONOS_SECCION = {
+    "Análisis Individual": "search",
+    "Rastreador": "radar",
+    "Gestión de Cartera": "work",
+    "Paper Trading": "science",
+    "Favoritos": "star",
+}
+
+TEXTO_ND = "Dato no disponible"
+
+# --------------------------------------------------------------- gráfico ----
+GRAFICO_ALTO = 560
+GRAFICO_PROPORCION_FILAS = (0.75, 0.25)  # precio / MACD
+# El histórico base se pide UNA vez en "max" diario y se recorta en pantalla
+# para 1M/1A/MAX: cambiar de rango no gasta petición. Solo 1D y 1S necesitan
+# velas intradía, que son una petición distinta (y ligera) que se cachea aparte.
+RANGOS_GRAFICO = {
+    "1D": ("1d", "5m"),
+    "1S": ("7d", "30m"),
+    "1M": None,   # recorte del histórico base
+    "1A": None,
+    "MAX": None,
+}
+RANGO_GRAFICO_DEFECTO = "1A"
+DIAS_RANGO = {"1M": 31, "1A": 366}
+
+# Colores del plan DCA sobre el gráfico: entradas en familia azul, salidas en
+# familia verde, stop en rojo. El tono se aclara del nivel 1 al 3, de modo que
+# el color codifica qué se hace y en qué orden llega.
+# Medias móviles sobre el gráfico de precio: cada una es una traza con su
+# entrada en la leyenda (se activan/desactivan pulsando en ella).
+COLORES_MEDIAS = {"MM50": "#0056a2", "MM100": "#25a18e", "MM200": "#f97316"}
+
+PLAN_COLORES_ENTRADA = ("#1d4ed8", "#3b82f6", "#93c5fd")
+PLAN_COLORES_SALIDA = ("#059669", "#10b981", "#6ee7b7")
+PLAN_COLOR_STOP = C_ROJO
+
+# ================================================================ CALIDAD ====
+# Tres bloques. La "valoración relativa al sector" NO forma parte de Calidad:
+# mide precio, que es lo que responde el Fair Value, y meterla aquí hacía que
+# la valoración entrase dos veces en el Timing (vía upside y vía salud) y que
+# el gate de salud >= 60 se pudiera superar solo por estar barata. Ver diseño
+# de motores en el CHANGELOG de la sesión 1.
+CALIDAD_BLOQUES = {
+    "I. Crecimiento": {
+        "cagr_ingresos_3a": 12,
+        "cagr_bpa_3a": 10,
+        "consistencia_ingresos": 5,   # % de ejercicios con ingresos crecientes
+        "crecimiento_fcf": 3,
+    },
+    "II. Rentabilidad y foso": {
+        "roic": 12,
+        "margen_bruto": 7,
+        "margen_operativo": 7,
+        "margen_fcf": 6,
+        "calidad_beneficio": 5,       # FCF / beneficio neto
+        "roe": 3,
+    },
+    "III. Salud financiera": {
+        "deuda_neta_ebitda": 8,
+        "cobertura_intereses": 6,
+        "dilucion": 6,                # variación de acciones en circulación 3a
+        "current_ratio": 4,
+        "fcf_positivo": 3,
+        "deuda_patrimonio": 3,
+    },
+}
+CALIDAD_PESOS = {m: p for b in CALIDAD_BLOQUES.values() for m, p in b.items()}
+assert sum(CALIDAD_PESOS.values()) == 100
+
+# Por debajo de esta cobertura el motor no devuelve nota: con menos de la
+# mitad de las métricas, la redistribución de peso ya no "rellena huecos",
+# inventa una empresa. Se muestra "Dato no disponible" con la cobertura real.
+CALIDAD_COBERTURA_MINIMA = 0.50
+
+# Tramos de puntuación de cada métrica: [(valor, puntos), ...] interpolados
+# linealmente (core_ponderar.puntuar_tramos). Fuera del rango se satura.
+# Las métricas RELATIVAS se puntúan por su cociente frente a la mediana del
+# sector: 0,5x -> 25, 1x -> 60, 1,5x -> 85, 2x -> 100. Igualar al sector vale
+# 60 y no 50 porque una empresa mediana de su sector sigue siendo un negocio
+# viable; el 50 se reserva para "por debajo de la referencia".
+CALIDAD_TRAMOS_RELATIVOS = [(0.0, 0), (0.5, 25), (1.0, 60), (1.5, 85), (2.0, 100)]
+CALIDAD_METRICAS_RELATIVAS = {"roic", "margen_bruto", "margen_operativo", "roe"}
+CALIDAD_TRAMOS = {
+    "cagr_ingresos_3a": [(-0.10, 0), (0.0, 25), (0.05, 50), (0.10, 70), (0.20, 90), (0.30, 100)],
+    "cagr_bpa_3a": [(-0.10, 0), (0.0, 25), (0.05, 50), (0.12, 75), (0.25, 100)],
+    "consistencia_ingresos": [(0.0, 0), (0.5, 40), (1.0, 100)],
+    "crecimiento_fcf": [(-0.15, 0), (0.0, 35), (0.10, 70), (0.25, 100)],
+    "margen_fcf": [(-0.10, 0), (0.0, 30), (0.05, 55), (0.15, 80), (0.25, 100)],
+    "calidad_beneficio": [(0.0, 0), (0.5, 35), (0.8, 65), (1.0, 85), (1.3, 100)],
+    "deuda_neta_ebitda": [(-1.0, 100), (0.0, 90), (1.0, 75), (2.0, 55), (3.0, 35), (4.0, 15), (6.0, 0)],
+    "cobertura_intereses": [(0.0, 0), (1.0, 15), (3.0, 45), (6.0, 70), (10.0, 90), (20.0, 100)],
+    "dilucion": [(-0.10, 100), (-0.03, 85), (0.0, 70), (0.03, 45), (0.10, 15), (0.25, 0)],
+    "current_ratio": [(0.5, 0), (1.0, 40), (1.5, 75), (2.0, 95), (3.0, 100)],
+    "fcf_positivo": [(0.0, 0), (0.34, 30), (0.67, 65), (1.0, 100)],
+    "deuda_patrimonio": [(0.0, 100), (0.5, 80), (1.0, 60), (2.0, 30), (3.0, 0)],
+}
+# Sectores estructuralmente apalancados (Utilities, Real Estate): la misma
+# deuda no es la misma señal. Tramos más laxos para las métricas de deuda.
+CALIDAD_TRAMOS_APALANCADOS = {
+    "deuda_neta_ebitda": [(0.0, 100), (2.0, 80), (4.0, 60), (6.0, 35), (8.0, 10)],
+    "deuda_patrimonio": [(0.0, 100), (1.0, 80), (2.0, 60), (4.0, 30), (6.0, 0)],
+}
+# Financieras: deuda/EBITDA, cobertura de intereses y current ratio no son
+# magnitudes económicas válidas (la deuda ES el negocio). Se excluyen y
+# `ponderar()` redistribuye su peso; la cobertura mostrada lo hace visible.
+CALIDAD_METRICAS_NO_FINANCIERAS = {"deuda_neta_ebitda", "cobertura_intereses", "current_ratio", "deuda_patrimonio"}
+CALIDAD_ANIOS_CRECIMIENTO = 3
+
+# Perfil de empresa: gobierna qué métodos de Fair Value se activan. Es
+# pre_rentabilidad si el BPA TTM y el forward son ambos <= 0.
+PERFIL_RENTABLE = "rentable"
+PERFIL_PRE_RENTABILIDAD = "pre_rentabilidad"
+
+# ============================================================= FAIR VALUE ====
+# Métodos de una sola multiplicación. Los forward pesan más que los trailing
+# porque el precio descuenta el futuro, y el consenso tiene peso FIJO: si su
+# peso creciera con el nº de analistas acabaría siendo a la vez el método
+# dominante y el ancla de la banda de cordura (se vigilaría a sí mismo).
+FV_PESOS = {
+    "per_historico": 0.15,   # A. mediana PER propio 5a x BPA TTM
+    "per_forward": 0.25,     # B. PER forward de industria x BPA forward
+    "peg": 0.20,             # C. PEG objetivo x crecimiento x BPA forward
+    "ev_ebitda": 0.20,       # D. EV/EBITDA de industria
+    "consenso": 0.20,        # precio objetivo medio de analistas
+}
+# Empresas sin beneficio: A, B y C no tienen BPA que multiplicar. Se apoya en
+# ventas y EBITDA (si es positivo) y en el consenso, con más peso porque en
+# estos negocios los analistas incorporan información (pipeline, contratos)
+# que ningún múltiplo captura.
+FV_PESOS_PRE_RENTABILIDAD = {
+    "ev_ventas": 0.45,
+    "ev_ebitda": 0.20,
+    "consenso": 0.35,
+}
+# yfinance solo sirve 4 ejercicios anuales: el PER histórico propio se
+# construye con los que haya (mínimo 3) a partir del cierre de cada ejercicio.
+FV_PER_HISTORICO_ANIOS = 5
+FV_PER_HISTORICO_MIN_ANIOS = 3
+# Si el PER más alto de la serie supera al más bajo en más de este factor, la
+# empresa no tiene un "PER propio" fiable (rampa de crecimiento o cargo
+# puntual) y el método se excluye.
+FV_PER_HISTORICO_INESTABILIDAD_MAX = 2.0
+# Regla de Lynch: PEG 1 = precio razonable para su crecimiento. No se usa un
+# PEG sectorial como objetivo porque al multiplicarse por el crecimiento
+# dispara el PER justo a niveles absurdos.
+FV_PEG_OBJETIVO = 1.0
+FV_PEG_CRECIMIENTO_MIN = 0.08   # por debajo, el PEG es un error de categoría: se excluye
+FV_PEG_CRECIMIENTO_MAX = 0.30   # techo: no extrapolar crecimientos explosivos
+# Mínimo de analistas para que el precio objetivo entre como método. Bajado
+# de 4 a 2 (decisión de Samuel, sesión 6): en small caps y valores europeos
+# la cobertura es corta y el método quedaba excluido casi siempre. El peso
+# sigue siendo FIJO, así que un consenso corto no gana influencia por serlo.
+FV_CONSENSO_MIN_ANALISTAS = 2
+# Referencias sectoriales por comparables reales (sesión 6). Orden de
+# preferencia de cada múltiplo/margen de referencia:
+#   1. mediana de los COMPARABLES validados del ticker (tabla `comparables`
+#      + múltiplos guardados en `multiplos`), si hay al menos este número
+#   2. mediana REAL del sector calculada por el rastreo nocturno sobre todo
+#      el universo analizado (`sector_referencias`), si hay al menos N
+#   3. tabla semilla de config_sectores (orden de magnitud)
+# Cada motor enseña qué referencia ha usado.
+REFERENCIA_PEERS_MIN = 3
+REFERENCIA_SECTOR_MIN = 8
+MULTIPLOS_MAX_DIAS = 7           # múltiplos guardados más antiguos se vuelven a pedir al abrir el bloque
+PEERS_MAX = 8                    # comparables que se muestran/cargan como máximo (coste: 1 info por peer)
+PEERS_SUGERIDOS_MAX = 6          # sugerencias de Finnhub que se siembran al ver un ticker por primera vez
+# Financieras: la deuda ES el negocio, así que EV/EBITDA no es magnitud
+# válida y el múltiplo natural es Precio / Valor contable (P/B x valor
+# contable por acción). REITs: el BPA GAAP se lo come la amortización del
+# inmueble; el múltiplo natural es Precio / FFO (FFO = beneficio neto +
+# amortización, por acción).
+FV_PESOS_FINANCIERA = {
+    "per_historico": 0.15,
+    "per_forward": 0.20,
+    "peg": 0.10,
+    "pb": 0.35,
+    "consenso": 0.20,
+}
+FV_PESOS_REIT = {
+    "p_ffo": 0.40,
+    "ev_ebitda": 0.25,
+    "consenso": 0.35,
+}
+REIT_P_FFO_REFERENCIA = 15.0     # semilla: P/FFO mediano histórico del sector REIT (13-18)
+
+# Banda de cordura sobre un ancla MIXTA (mediana de métodos propios + consenso).
+# Asimétrica: el sell-side publica objetivos por encima del precio de forma
+# sistemática, así que se tolera más desviación por abajo que por arriba.
+# Dentro de la banda: se usa tal cual. Hasta el límite de exclusión: se recorta
+# al borde (discrepa, pero su dirección es información). Más allá: se excluye
+# (ha fallado; recortarlo solo arrastraría la media con un número inventado).
+FV_BANDA_SUELO = 0.60
+FV_BANDA_TECHO = 1.60
+FV_EXCLUSION_SUELO = 0.35
+FV_EXCLUSION_TECHO = 2.50
+
+# Sensibilidad: cada escenario mueve a la vez el múltiplo de referencia y el
+# crecimiento estimado, y cambia el consenso medio por el bajo/alto.
+FV_ESCENARIOS = {
+    "conservador": {"multiplo": 0.85, "crecimiento": 0.80, "consenso": "bajo"},
+    "base": {"multiplo": 1.00, "crecimiento": 1.00, "consenso": "medio"},
+    "optimista": {"multiplo": 1.15, "crecimiento": 1.20, "consenso": "alto"},
+}
+
+# Detección de anomalías: un upside fuera de este rango no se muestra con la
+# confianza habitual, se marca "revisar manualmente".
+FV_UPSIDE_ANOMALIA = (-70.0, 150.0)
+
+# Bandas de valoración: (upside_min, upside_max, etiqueta, color), % sobre el
+# precio. Zona neutra +-5%: la dispersión típica entre métodos es del 20-30%,
+# así que dentro de +-5% nada es distinguible de "precio justo".
+BANDAS_VALORACION = [
+    (35.0, None, "MUY INFRAVALORADA — Oportunidad excepcional", C_VERDE_OSCURO),
+    (15.0, 35.0, "INFRAVALORADA — Potencial alcista significativo", C_VERDE),
+    (5.0, 15.0, "LIGERAMENTE INFRAVALORADA — Entrada atractiva", C_TEAL),
+    (-5.0, 5.0, "PRECIO JUSTO — En rango de valor razonable", C_AMBAR),
+    (-20.0, -5.0, "EN OBSERVACIÓN — Por encima del valor objetivo", C_NARANJA),
+    (-35.0, -20.0, "SOBREVALORADA — Riesgo de corrección moderada", C_ROJO),
+    (None, -35.0, "MUY SOBREVALORADA — Riesgo de corrección severa", C_ROJO_OSCURO),
+]
+
+# ================================================================= TIMING ====
+# Suman 100 para que el peso bruto coincida con el % en pantalla.
+# `margen_seguridad` no existe: era `upside` con otro denominador, la misma
+# lectura contada dos veces, y cualquier error del FV entraba por duplicado.
+TIMING_PESOS = {
+    # Momentum y flujo (27)
+    # Momentum y flujo (26)
+    "rsi": 9,
+    "macd": 8,
+    "obv": 4,
+    "adx": 5,
+    # Estructura de precio (21)
+    "mm50": 5,
+    "mm100": 4,
+    "mm200": 6,
+    "ath_atl": 3,
+    "variacion_1a": 3,
+    # Valoración (20)
+    "upside": 14,
+    "peg": 6,
+    # Calidad (12)
+    "salud_fundamental": 12,
+    # Contexto (21)
+    "proximidad_earnings": 5,
+    "confluencia_dca": 8,
+    "volumen_relativo": 5,
+    # Revisiones de recomendación de analistas (sesión 6): entra la VARIACIÓN
+    # de la distribución (hacia compra / hacia venta), nunca el nivel, que
+    # está sesgado al alza de forma sistemática. Peso pequeño (3) porque el
+    # sell-side ya toca el veredicto vía precio objetivo (Fair Value) y
+    # upside (Timing); los 3 puntos salen de obv, ath_atl y variacion_1a.
+    "revisiones_analistas": 3,
+}
+assert sum(TIMING_PESOS.values()) == 100
+
+# Gate de calidad: sin salud >= 60 el timing no pasa de VIGILAR. Buen timing en
+# mala empresa es trading, no lo que busca esta app.
+CALIDAD_MINIMA_TIMING = 60
+TIMING_TOPE_SIN_SALUD = 59
+
+# Cinco niveles con verbo de acción. La frontera ENTRAR/ACUMULAR (comprar hoy
+# vs dejar orden en el nivel 1) es la más accionable y un esquema de 4 la fundía.
+SENIALES_TIMING = [
+    (80, "ENTRAR", C_VERDE_OSCURO),
+    (65, "ACUMULAR", C_VERDE),
+    (45, "VIGILAR", C_AMBAR),
+    (25, "ESPERAR", C_NARANJA),
+    (0, "EVITAR", C_ROJO),
+]
+
+# Veredicto final: matriz con vetos, no media (una media esconde el veto de
+# calidad). Etiquetas de dos palabras, nunca un párrafo.
+VEREDICTOS = {
+    "comprar": ("COMPRAR", C_VERDE_OSCURO),
+    "acumular": ("ACUMULAR POR TRAMOS", C_VERDE),
+    "vigilar": ("VIGILAR", C_AMBAR),
+    "no_comprar": ("NO COMPRAR", C_ROJO),
+    "reducir": ("REDUCIR", C_ROJO_OSCURO),
+}
+VEREDICTO_UPSIDE_MIN = 5.0     # % mínimo para considerar compra
+VEREDICTO_UPSIDE_REDUCIR = -20.0
+
+# Tramos 0-100 de cada componente del Timing (interpolación lineal, ver
+# core_ponderar.puntuar_tramos). Orientación: ¿es buen momento para COMPRAR?
+# - RSI: la sobreventa puntúa alto, pero un RSI < 20 es cuchillo cayendo y
+#   se recorta; la sobrecompra puntúa bajo.
+# - MACD: histograma normalizado por ATR (independiente del precio).
+# - OBV: pendiente de 20 sesiones normalizada por volumen medio (acumulación
+#   positiva confirma; distribución penaliza).
+# - Medias: estar por encima es sano, pero muy por encima es extensión.
+# - ATH: un descuento moderado sobre máximos es mejor entrada que el máximo
+#   mismo; un descuento del 70 % ya es sospecha, no oportunidad.
+# - Upside/PEG: el margen de precio; salud: la nota de Calidad tal cual.
+# - Earnings: entrar a < 10 días de resultados es riesgo binario.
+# - Confluencia: distancia a E1 en ATR (cerca de la zona = momento de actuar).
+TIMING_TRAMOS = {
+    "rsi": [(15, 65), (25, 95), (35, 100), (50, 70), (60, 55), (70, 30), (85, 0)],
+    "macd": [(-1.0, 0), (-0.3, 25), (0.0, 50), (0.3, 75), (1.0, 100)],
+    "obv": [(-1.0, 0), (-0.3, 30), (0.0, 50), (0.3, 70), (1.0, 100)],
+    "mm50": [(-25, 20), (-10, 40), (0, 60), (3, 80), (10, 100), (20, 70), (40, 40)],
+    "mm100": [(-25, 20), (-10, 40), (0, 60), (3, 80), (10, 100), (25, 70), (50, 40)],
+    "mm200": [(-30, 15), (-10, 40), (0, 65), (5, 85), (15, 100), (30, 70), (60, 40)],
+    "ath_atl": [(-70, 50), (-40, 80), (-20, 90), (-10, 75), (-3, 55), (0, 45)],
+    "variacion_1a": [(-60, 30), (-30, 60), (-10, 75), (0, 70), (20, 65), (50, 45), (100, 25)],
+    "upside": [(-30, 0), (-5, 25), (5, 50), (15, 70), (35, 90), (60, 100)],
+    "peg": [(0.5, 100), (1.0, 85), (1.5, 60), (2.0, 40), (3.0, 15), (4.0, 0)],
+    "proximidad_earnings": [(0, 15), (10, 20), (20, 55), (30, 75), (60, 90), (120, 90)],
+    "confluencia_dca": [(0, 100), (1, 85), (2, 65), (4, 40), (8, 15)],
+    "volumen_relativo": [(0.5, 40), (1.0, 55), (1.5, 75), (2.5, 90)],
+    # Revisión neta a 3 meses (core_analistas.revision): variación del índice
+    # de recomendación (-2 venta fuerte ... +2 compra fuerte, media por
+    # analista). +0,5 = un tercio de la cobertura subió un escalón entero.
+    "revisiones_analistas": [(-0.6, 10), (-0.2, 35), (0.0, 50), (0.2, 70), (0.6, 100)],
+}
+TIMING_FAMILIAS = {
+    "Momentum y flujo": ("rsi", "macd", "obv", "adx"),
+    "Estructura de precio": ("mm50", "mm100", "mm200", "ath_atl", "variacion_1a"),
+    "Valoración": ("upside", "peg"),
+    "Calidad": ("salud_fundamental",),
+    "Contexto": ("proximidad_earnings", "confluencia_dca", "volumen_relativo", "revisiones_analistas"),
+}
+# Recomendaciones de analistas (Finnhub /stock/recommendation, respaldo
+# yfinance): serie mensual de la distribución. Con menos analistas que este
+# mínimo la revisión no se puntúa (un cambio de 1 sobre 2 no es tendencia).
+ANALISTAS_MIN_REVISION = 3
+ANALISTAS_MESES_REVISION = 3
+ANALISTAS_MESES_SERIE = 6        # meses de serie que se guardan/enseñan
+ANALISTAS_CONSENSO = [   # (índice mínimo, etiqueta, color) sobre el índice -2..+2
+    (1.5, "Compra fuerte", C_VERDE_OSCURO),
+    (0.5, "Compra", C_VERDE),
+    (-0.5, "Mantener", C_AMBAR),
+    (-1.5, "Venta", C_NARANJA),
+    (-2.1, "Venta fuerte", C_ROJO),
+]
+ANALISTAS_COLORES = {"strongBuy": C_VERDE_OSCURO, "buy": C_VERDE, "hold": C_AMBAR, "sell": C_NARANJA, "strongSell": C_ROJO}
+ANALISTAS_ETIQUETAS = {"strongBuy": "Compra fuerte", "buy": "Compra", "hold": "Mantener", "sell": "Venta", "strongSell": "Venta fuerte"}
+TIMING_OBV_SESIONES = 20
+TIMING_VOLUMEN_DISTRIBUCION = 25   # puntos si el volumen sube con precio cayendo (distribución)
+
+INDICADOR_VENTANAS = {"mm50": 50, "mm100": 100, "mm200": 200, "atr": 14, "rsi": 14, "adx": 14}
+MACD_PARAMS = (12, 26, 9)
+TIMING_VOLUMEN_SESIONES = 5      # ventana corta vs media de 3 meses
+TIMING_EARNINGS_DIAS_CERCA = 10  # a menos de esto se penaliza entrar (riesgo binario)
+
+# ========================================================= INTERPRETACIÓN ====
+# Umbrales del semáforo verde/rojo del panel de métricas y de las lecturas
+# en texto (zona del RSI, fuerza del ADX, sentimiento por short interest).
+# Lo que no cae en verde ni en rojo se deja en neutro: un dato "normal" no
+# debe gritar. Las métricas con referencia sectorial se juzgan por cociente
+# frente al sector; las absolutas, por estos tramos.
+RSI_ZONAS = [   # (límite superior, etiqueta, semáforo) — la última es abierta
+    (30, "Sobreventa", "bien"),
+    (40, "Zona baja, cerca de sobreventa", "bien"),
+    (60, "Zona neutra", None),
+    (70, "Zona alta, cerca de sobrecompra", "mal"),
+    (101, "Sobrecompra", "mal"),
+]
+ADX_FUERZA = [  # (límite superior, etiqueta)
+    (20, "sin tendencia definida (rango lateral)"),
+    (25, "tendencia débil"),
+    (40, "tendencia fuerte"),
+    (101, "tendencia muy fuerte"),
+]
+ADX_TENDENCIA_MIN = 25          # por debajo, la dirección de +DI/-DI no se considera fiable
+SHORT_INTEREST_TRAMOS = [   # (límite superior, etiqueta, semáforo) sobre el % del float
+    (0.03, "muy bajo: sin presión bajista relevante", "bien"),
+    (0.08, "moderado: escepticismo contenido", None),
+    (0.15, "elevado: el mercado apuesta en contra; volatilidad probable", "mal"),
+    (1.01, "muy alto: fuerte sentimiento bajista, riesgo binario (posible short squeeze)", "mal"),
+]
+SHORT_RATIO_SQUEEZE = 5.0   # días para cubrir a partir de los cuales un squeeze es plausible
+# Cociente valor / referencia sectorial. "Menor mejor" (múltiplos): verde por
+# debajo del primero, rojo por encima del segundo. "Mayor mejor" (márgenes,
+# retornos): al revés. La franja intermedia queda neutra.
+SEMAFORO_RATIO_MENOR_MEJOR = (0.85, 1.25)
+SEMAFORO_RATIO_MAYOR_MEJOR = (0.80, 1.20)
+# Umbrales absolutos para métricas sin referencia sectorial.
+SEMAFORO_ABSOLUTO = {         # clave: (verde si <=, rojo si >=)  o  (verde si >=, rojo si <=)
+    "per_trailing": ("menor", 15.0, 35.0),
+    "precio_ventas": ("menor", 2.0, 8.0),
+    "precio_valor_contable": ("menor", 2.0, 8.0),
+    "margen_ebitda": ("mayor", 0.20, 0.05),
+    "roa": ("mayor", 0.08, 0.02),
+    "current_ratio": ("mayor", 1.5, 1.0),
+    "deuda_patrimonio": ("menor", 0.5, 1.5),
+    "short_ratio": ("menor", 3.0, 7.0),
+    "beta": ("menor", 1.0, 1.8),
+}
+
+# ============================================================ CONFLUENCIA ====
+# Pesos de cada candidato a soporte/resistencia. El orden expresa fiabilidad:
+# volumen negociado y estructura semanal por encima de medias móviles cortas.
+CONFLUENCIA_PESOS = {
+    "mm50": 1.0,
+    "mm100": 1.2,
+    "mm200": 2.0,
+    "pivote_diario": 1.0,
+    "pivote_semanal": 1.8,
+    "poc": 2.4,
+    "value_area": 1.3,
+    "diagonal": 1.6,
+    "gap": 1.2,
+    "min_52s": 2.0,
+    "max_52s": 2.0,
+    "fibonacci": 0.8,
+    "redondo": 0.5,      # desempate, nunca argumento
+}
+# Cada candidato es una gaussiana de anchura SIGMA (en ATR) y altura = peso;
+# las zonas son los máximos locales de la suma. Sin umbral binario de cluster.
+CONFLUENCIA_SIGMA_ATR = 0.50
+CONFLUENCIA_SIGMA_PCT_RESPALDO = 0.018
+CONFLUENCIA_SIGMA_MIN_PCT = 0.004
+CONFLUENCIA_SIGMA_MAX_PCT = 0.030
+CONFLUENCIA_REJILLA = 800
+CONFLUENCIA_PESO_MIN_ZONA = 0.8
+CONFLUENCIA_FUERTE = 5.0         # a partir de aquí una zona cuenta como "confluencia fuerte"
+
+PIVOTE_VENTANA_DIARIA = 5        # sesiones a cada lado
+PIVOTE_VENTANA_SEMANAL = 4       # semanas a cada lado
+# Los pivotes semanales se buscan solo en los últimos años: más atrás, con
+# splits y otro régimen de precio, son ruido decorativo (y ya decaen a 0,6).
+PIVOTE_SEMANAL_ANIOS = 10
+PIVOTE_TOQUES_MULT = 0.35        # peso *= 1 + MULT * ln(toques)
+PIVOTE_DECADENCIA_ANIOS = 3.0
+PIVOTE_DECADENCIA_MIN = 0.60
+VP_SESIONES = 504
+VP_BANDAS = 60
+VP_VALUE_AREA_PCT = 0.70
+DIAGONAL_MIN_TOQUES = 3
+DIAGONAL_TOLERANCIA_ATR = 0.75
+DIAGONAL_SESIONES = 378
+DIAGONAL_MAX_POR_LADO = 3        # directrices que sobreviven por lado: las de más toques
+GAP_MIN_PCT = 0.02               # huecos menores son ruido de apertura
+NIVEL_REDONDO_MAX = 3
+
+# ================================================================ PLAN DCA ====
+DCA_PESOS_ENTRADA = (0.40, 0.35, 0.25)
+DCA_PESOS_SALIDA = (0.35, 0.35, 0.30)
+# El nivel 1 NO tiene separación mínima respecto al precio actual: si hay
+# confluencia fuerte pegada al precio, ahí va. La separación solo rige entre
+# N1-N2 y N2-N3, adaptativa al ATR y acotada.
+DCA_SEPARACION_ATR_ENTRADAS = 2.0
+DCA_SEPARACION_ATR_SALIDAS = 1.5
+DCA_SEPARACION_MIN_PCT = 0.03
+DCA_SEPARACION_MAX_PCT = 0.20
+# Rango de trabajo: una zona fortísima a -60% es inútil como entrada de un
+# DCA (no se ejecutará nunca) y se descarta ANTES de agrupar.
+DCA_RANGO_ATR = 10.0
+DCA_RANGO_ENTRADAS_MIN_PCT = 0.20
+DCA_RANGO_ENTRADAS_MAX_PCT = 0.40
+DCA_RANGO_SALIDAS_MIN_PCT = 0.30
+DCA_RANGO_SALIDAS_MAX_PCT = 0.60
+# Salidas: la 3ª se ancla al fair value salvo resistencia fuerte cerca; con
+# tendencia fuerte confirmada se permite extender por encima hasta este factor.
+DCA_SALIDA_ADX_TENDENCIA = 25
+DCA_SALIDA_EXTENSION_MAX = 1.15
+# Stop sobre el coste medio estimado del plan (no sobre el nivel 1): así la
+# restricción es "no arriesgo más de un X% de lo invertido" y no puede chocar
+# con la escalera de entradas.
+DCA_STOP_ATR_MULT = 2.5
+DCA_STOP_CAIDA_MAX = 0.25
+DCA_STOP_MARGEN_ATR_BAJO_N3 = 1.5
+DCA_STOP_CAIDA_RESPALDO = 0.15   # sin ATR utilizable
+
+# ================================================================ CARTERA ====
+CARTERA_DIVISA_BASE = "EUR"
+CARTERA_DIVISAS_CONVERTIBLES = ("EUR", "USD")
+# El saldo se obtiene sumando y restando flotantes: tras vender todo puede
+# quedar un residuo de 1e-14 acciones que dejaría la posición "abierta".
+CARTERA_TOLERANCIA_ACCIONES = 1e-6
+BENCHMARK = "SPY"   # convertido a EUR para compararlo con la cartera
+# Dos costes medios conviven a propósito: el PONDERADO es el que se enseña en
+# la ficha (es lo que el inversor tiene en la cabeza y lo que usa el stop del
+# plan), el FIFO es el que manda en el realizado (criterio fiscal español:
+# las primeras acciones compradas son las primeras que se venden).
+CARTERA_COMISION_DEFECTO = 1.0     # EUR por operación (Trade Republic)
+# Divisa de cotización por sufijo del ticker: cero peticiones para los casos
+# habituales; solo un sufijo desconocido pregunta a fast_info (cacheado 48 h).
+# Sin sufijo = mercado estadounidense = USD.
+SUFIJOS_DIVISA = {
+    "": "USD", ".MC": "EUR", ".DE": "EUR", ".F": "EUR", ".PA": "EUR", ".MI": "EUR", ".AS": "EUR",
+    ".BR": "EUR", ".LS": "EUR", ".VI": "EUR", ".HE": "EUR", ".IR": "EUR", ".L": "GBP", ".SW": "CHF",
+    ".TO": "CAD", ".HK": "HKD", ".T": "JPY", ".ST": "SEK", ".CO": "DKK", ".OL": "NOK",
+}
+# Curva de rendimiento y correlación: UNA descarga por lote (tickers + SPY +
+# pares FX) cacheada por cubo de mercado, desde la operación más antigua o,
+# como mínimo, este número de días; la correlación se calcula sobre el
+# último año.
+CARTERA_HISTORICO_DIAS = 366
+CARTERA_CORRELACION_MIN_SESIONES = 60   # con menos, la correlación es ruido
+CARTERA_CORRELACION_ALTA = 0.75         # a partir de aquí dos posiciones son "la misma apuesta"
+CARTERA_PESO_ALERTA = 0.25              # una posición > 25 % de la cartera se marca
+CARTERA_SECTOR_ALERTA = 0.40            # un sector > 40 % de la cartera se marca
+
+# ------------------------------------------- recomendación por posición ----
+# Qué hacer con cada posición abierta según DOS ejes: dónde está el precio
+# respecto al coste medio (latente %) y el momentum actual del valor. El
+# momentum se resume en un índice 0-100 con cinco componentes puntuados por
+# tramos y promediados: lectura "seguidora de tendencia" (a diferencia del
+# Timing, que busca dónde ENTRAR, aquí se juzga si la tendencia acompaña a
+# una posición que YA se tiene). Sobre cierres de un año en la divisa de
+# cotización: la conversión a EUR metería ruido de divisa en el momentum.
+MOMENTUM_TRAMOS = {
+    "rsi":        [(25, 20), (40, 40), (50, 55), (60, 75), (70, 90), (78, 80), (90, 55)],   # RSI > 78 = extensión
+    "dist_mm50":  [(-12, 10), (-4, 35), (0, 55), (3, 75), (10, 90), (25, 65)],
+    "dist_mm200": [(-25, 10), (-8, 35), (0, 55), (5, 75), (20, 90), (45, 65)],
+    "ret_20":     [(-15, 10), (-5, 35), (0, 50), (5, 70), (15, 90), (30, 70)],           # retorno 20 sesiones, %
+    "macd":       [(-1.0, 15), (-0.2, 40), (0.0, 50), (0.2, 65), (1.0, 90)],             # histograma / ATR aprox (% precio)
+}
+MOMENTUM_NIVELES = [   # (nota mínima, nivel -2..+2, etiqueta)
+    (68, 2, "alcista fuerte"),
+    (56, 1, "alcista"),
+    (44, 0, "neutro"),
+    (32, -1, "bajista"),
+    (0, -2, "bajista fuerte"),
+]
+MOMENTUM_RSI_SOBRECOMPRA = 75
+MOMENTUM_MIN_SESIONES = 60       # con menos cierres no hay momentum fiable
+# Umbrales de latente (%) de la matriz de recomendación (core_cartera.recomendar).
+CARTERA_RECO_PERDIDA_VENDER = -20.0     # pérdida grande + momentum bajista fuerte: cortar
+CARTERA_RECO_PERDIDA_REDUCIR = -8.0     # pérdida moderada + momentum bajista: aligerar
+CARTERA_RECO_GANANCIA_PARCIAL = 25.0    # ganancia amplia con sobrecompra o giro: recoger parte
+CARTERA_RECO_GANANCIA_PROTEGER = 12.0   # ganancia media con momentum bajista: proteger parte
+CARTERA_RECO_AMPLIAR_MAX = 10.0         # por encima del coste, solo se piramida cerca de él
+RECOMENDACIONES = {
+    "ampliar":       ("AMPLIAR", C_VERDE_OSCURO),
+    "mantener":      ("MANTENER", C_VERDE),
+    "esperar":       ("ESPERAR", C_AMBAR),
+    "venta_parcial": ("VENTA PARCIAL", C_NARANJA),
+    "reducir":       ("REDUCIR", C_ROJO),
+    "vender":        ("VENDER", C_ROJO_OSCURO),
+}
+# Veredictos del último análisis guardado que vetan AMPLIAR (nunca se añade
+# a una posición que el propio motor no compraría hoy).
+RECO_VEREDICTOS_VETO_AMPLIAR = ("NO COMPRAR", "REDUCIR")
+
+# ---------------------------------------------------------- paper trading ----
+# Capital nominal de cada plan simulado: las entradas E1/E2/E3 reparten este
+# importe con los pesos DCA (40/35/25). Se fija al ejecutar el primer nivel y
+# no vuelve a cambiar, así el rendimiento simulado es comparable entre planes.
+PAPER_CAPITAL_DEFECTO = 1000.0
+PAPER_NIVELES_ENTRADA = ("E1", "E2", "E3")
+PAPER_NIVELES_SALIDA = ("S1", "S2", "S3")
+PAPER_NIVEL_STOP = "STOP"
+# Niveles que se ejecutan SOLOS cuando el precio los alcanza (al abrir la
+# vista de Paper Trading y en cada pase del cron de alertas): una orden
+# limitada de compra se llena cuando el precio toca o cae por debajo del
+# nivel. Solo E1 por diseño: E2/E3 son decisiones de promediar que el
+# usuario confirma a mano viendo cómo llega el precio a la zona.
+PAPER_AUTO_NIVELES = ("E1",)
+
+# ---------------------------------------------------------- paper trading ----
+PAPER_ESTADOS = {
+    "vigilancia":      ("Vigilando", C_AMBAR),
+    "parcial_entrada": ("Abierto, en marcha", C_TEAL),
+    "abierta":         ("Abierto, completado", C_VERDE),
+    "parcial_salida":  ("Cerrado parcialmente", C_AZUL),
+    "cerrada":         ("Cerrado, completado", C_PRIMARIO),
+    "descartada":      ("Descartado", C_TEXTO_TENUE),
+}
+PAPER_ESTADOS_ACTIVOS = ("vigilancia", "parcial_entrada", "abierta", "parcial_salida")
+PAPER_ESTADOS_CERRADOS = ("cerrada",)
+PAPER_ESTADOS_DESCARTADOS = ("descartada",)
+
+# ============================================================== RASTREADOR ====
+# Análisis en bloque. Cada ticker cuesta las mismas peticiones que un
+# análisis individual (histórico, info, estados, precio, earnings): el lote
+# solo abarata los precios. Por eso hay un tope por rastreo: con más valores
+# Yahoo empieza a devolver vacíos y se contamina la caché de fallos.
+RASTREADOR_MAX_TICKERS = 40
+# Puntuación de rastreo (ranking por defecto): calidad, timing y el upside
+# convertido a 0-100 con el mismo tramo que usa el Timing. Un dato ausente se
+# excluye y su peso se reparte (ponderar), como en todos los motores.
+RASTREADOR_PESOS = {"calidad": 40, "timing": 35, "upside": 25}
+# Orden de los veredictos de mejor a peor: manda por encima de la puntuación
+# (un NO COMPRAR con puntuación alta sigue siendo NO COMPRAR).
+VEREDICTO_ORDEN = ("COMPRAR", "ACUMULAR POR TRAMOS", "VIGILAR", "NO COMPRAR", "REDUCIR")
+# Evaluación de señales: retorno de cada análisis guardado a estos
+# horizontes (días naturales) frente al benchmark, agrupado por veredicto y
+# por señal de timing. Es un backtest sobre el histórico PROPIO: solo evalúa
+# señales que el motor emitió de verdad, no reconstrucciones.
+RASTREADOR_HORIZONTES = {"3m": 91, "6m": 182, "12m": 365}
+RASTREADOR_EVALUACION_MIN_DIAS = 5   # un análisis de hace menos días no se evalúa (ruido)
+
+# --------------------------------------------- rastreo nocturno (cron) ----
+# Índices enteros no caben en una petición interactiva (500 tickers son
+# ~2.500 peticiones a Yahoo). Se rastrean en GitHub Actions por la noche
+# (tarea_rastreo.py, .github/workflows/rastreo.yml) escribiendo cada
+# análisis en `analisis_historico` con origen 'cron'; la vista Rastreador
+# tiene un modo Screener que filtra sobre lo persistido: coste en API cero.
+# Constituyentes: tablas de Wikipedia (datos_indices.py), refrescadas cada
+# INDICES_REFRESCO_DIAS y guardadas en `rastreador_indices`.
+# Cada índice lleva varias páginas candidatas (la primera que tenga una
+# tabla de constituyentes con columna de ticker gana): la Wikipedia inglesa
+# quitó las tablas del Nasdaq-100 y del Dow, la alemana y la española las
+# mantienen. Se comprobó el 2026-09-18.
+INDICES = {   # nombre visible -> (páginas candidatas, sufijo de Yahoo si el ticker no lo trae)
+    "S&P 500": (("https://en.wikipedia.org/wiki/List_of_S%26P_500_companies",), ""),
+    "Nasdaq 100": (("https://de.wikipedia.org/wiki/NASDAQ-100", "https://en.wikipedia.org/wiki/Nasdaq-100"), ""),
+    "Dow Jones": (("https://es.wikipedia.org/wiki/Dow_Jones_Industrial_Average",
+                   "https://en.wikipedia.org/wiki/Dow_Jones_Industrial_Average"), ""),
+    "IBEX 35": (("https://en.wikipedia.org/wiki/IBEX_35",), ".MC"),
+    "Euro Stoxx 50": (("https://en.wikipedia.org/wiki/EURO_STOXX_50",), ""),
+}
+INDICES_MIN_CONSTITUYENTES = 20   # una "tabla de constituyentes" con menos filas es otra cosa
+INDICES_REFRESCO_DIAS = 7
+RASTREO_CRON_PAUSA_SEG = 1.2       # entre tickers: sin prisa, nadie espera
+RASTREO_CRON_PAUSA_429_SEG = 90    # tras un límite de Yahoo: parar y seguir
+RASTREO_CRON_MAX_ERRORES_SEGUIDOS = 15   # con tantos fallos seguidos, Yahoo nos ha cortado: abortar el pase
+SCREENER_MAX_DIAS = 10             # el screener enseña el último análisis de cada ticker si no es más viejo que esto
+SCREENER_MAX_FILAS = 5000
+# Alertas del screener (sesión 7): tras el pase nocturno, un mensaje Telegram
+# con lo que ha CAMBIADO: valores que hoy son COMPRAR / ACUMULAR y ayer no
+# lo eran, y valores con calidad >= mínimo cuyo precio ha llegado a E1.
+# Se limita a los mejores por puntuación para que el mensaje se lea.
+SCREENER_ALERTA_VEREDICTOS = ("COMPRAR", "ACUMULAR POR TRAMOS")
+SCREENER_ALERTA_CALIDAD_MIN = 70
+SCREENER_ALERTA_E1_PCT = 0.0        # precio <= E1 (distancia % a E1 <= este valor) cuenta como "ha llegado"
+SCREENER_ALERTA_MAX = 6
+# Comparables validados como índice virtual del cron: sus múltiplos se
+# refrescan cada noche aunque no estén en ningún índice activo.
+RASTREO_INDICE_COMPARABLES = "Comparables"
+# Evaluación de señales del cron (backtest): se hace en el propio cron,
+# una vez por semana (día ISO: 5 = viernes) sobre las señales que acaban
+# de cumplir cada horizonte (ventana de días), y se persiste en
+# backtest_resultados. Tickers por lote de descarga de cierres.
+RASTREO_EVALUAR_DIA_SEMANA = 5
+RASTREO_EVALUAR_VENTANA_DIAS = 8
+RASTREO_EVALUAR_LOTE = 100
+HISTORIAL_TICKER_MAX = 250          # análisis guardados que enseña el histórico de veredictos de un ticker
+
+# ================================================================= ALERTAS ====
+# Reglas del cron (tarea_alertas.py, GitHub Actions cada hora en sesión).
+# Cada alerta lleva una clave de deduplicación en `alertas_enviadas`: las de
+# nivel se envían UNA vez por (plan, nivel); las de cercanía, movimiento y
+# recomendación, una vez al día; el resumen de cierre, una vez por sesión.
+ALERTA_CERCA_PCT = 1.5          # distancia (%) a un nivel pendiente para avisar de que está cerca
+ALERTA_MOVIMIENTO_PCT = 5.0     # variación diaria (%) de una posición real que merece aviso
+ALERTA_RECOS_AVISO = ("vender", "reducir", "venta_parcial")   # recomendaciones que se notifican
+ALERTA_RESUMEN_MOVERS = 3       # mayores subidas/bajadas en el resumen de cierre
+
+# ================================================================== CACHÉ ====
+# TTL en segundos. El histórico diario NO usa TTL como mecanismo real: usa el
+# "cubo de mercado" de datos_cache.py, que congela la caché mientras el
+# mercado está cerrado y la revalida una vez por hora en sesión. El TTL de
+# respaldo es solo cinturón de seguridad.
+TTL_PRECIO = 300
+TTL_INTRADIA = 300
+TTL_HISTORICO_RESPALDO = 21600
+TTL_INFO = 3600
+TTL_ESTADOS_FINANCIEROS = 172800   # solo cambian 4 veces al año
+TTL_NOTICIAS = 900
+TTL_EARNINGS = 21600          # calendario de resultados: cambia con cada publicación
+TTL_RECOMENDACIONES = 43200   # serie mensual de recomendaciones: cambia despacio
+TTL_PEERS = 172800            # sugerencias de comparables: casi estáticas
+TTL_TRADUCCION = 172800       # la descripción de una empresa apenas cambia
+TTL_ESTADOS_FINANCIEROS_L1 = TTL_ESTADOS_FINANCIEROS
+TTL_FX = 600
+TTL_LOTE = 900
+
+# Antigüedad esperada por tipo de dato para el indicador de frescura de cada
+# bloque: por encima, aviso visual.
+FRESCURA_ESPERADA = {
+    "precio": 900,
+    "historico": 86400,
+    "info": 86400,
+    "fundamentales": 172800 * 45,   # ~un trimestre
+    "noticias": 3600,
+}
+
+# ---------------------------------------------------------------- Finnhub ----
+NOTICIAS_N = 5
+NOTICIAS_DIAS = 30            # ventana hacia atrás para company-news
+EARNINGS_TRIMESTRES = 4       # racha de sorpresas mostrada (un año completo)
+# Ventana del calendario: ~4 trimestres pasados. Se queda por debajo de un
+# año porque el plan gratuito de Finnhub restringe el histórico anterior a
+# 12 meses y una ventana que lo cruza puede rechazarse entera.
+EARNINGS_DIAS_ATRAS = 360
+EARNINGS_DIAS_ADELANTE = 120  # ... y el próximo
+
+MERCADO_ZONA_HORARIA = "America/New_York"
+MERCADO_HORA_APERTURA = (9, 30)
+MERCADO_HORA_CIERRE = (16, 0)
+# Festivos NYSE fijos y móviles se añaden en datos_cache.py; un festivo no
+# contemplado se trata como sesión normal (cuesta, como mucho, una petición).

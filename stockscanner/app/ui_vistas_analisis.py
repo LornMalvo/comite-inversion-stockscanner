@@ -1,0 +1,382 @@
+"""Análisis Individual. Distribución según el wireframe:
+
+  [ campo ticker ][ Analizar ]
+  etiqueta TICKER · Nombre -> Sector      Precio actual      [☆ Favorito]
+  ┌ Contexto (1) ┐ ┌ Gráfico + MACD + fundamentales y técnicos (2) ┐
+  └──────────────┘ └ Anotaciones manuales ─────────────────────────┘
+  ┌ Calidad / FV ┐ ┌ Timing y señal ┐ ┌ Plan DCA y veredicto ┐
+  ┌ Comparables (peer to peer) ───────────────────────────────────┐
+
+El resultado caro vive en `st.session_state["analisis"]` y solo se recalcula
+al pulsar Analizar. Los cambios baratos (rango, toggle, estrella, nota)
+provocan reruns que NO repiten peticiones: todo está cacheado o en
+session_state.
+"""
+
+from __future__ import annotations
+
+import pandas as pd
+import streamlit as st
+
+import datos_analisis
+import datos_traduccion
+import db_supabase
+import core_analistas
+import ui_bloque_calidad_fv
+import ui_bloque_peers
+import ui_bloque_plan
+import ui_bloque_timing
+import ui_componentes as ui
+import ui_graficos
+import ui_metricas
+from config_settings import (
+    VEREDICTOS,
+    ANALISTAS_COLORES,
+    ANALISTAS_ETIQUETAS,
+    C_TEXTO_TENUE,
+    DIAS_RANGO,
+    EARNINGS_TRIMESTRES,
+    RANGO_GRAFICO_DEFECTO,
+    RANGOS_GRAFICO,
+    TEXTO_ND,
+)
+from core_ponderar import es_dato
+from datos_yfinance import obtener_intradia
+
+CLAVE_ANALISIS = "analisis"
+CLAVE_TICKER_PENDIENTE = "ticker_pendiente"   # lo rellena Favoritos/Rastreador
+
+
+# ----------------------------------------------------------------- análisis --
+def analizar(ticker: str) -> dict | None:
+    """Análisis completo (datos_analisis.analizar): la orquestación de los
+    motores vive fuera de la vista para que el Rastreador y el cron la
+    compartan."""
+    return datos_analisis.analizar(ticker)
+
+
+def _formulario() -> None:
+    pendiente = st.session_state.pop(CLAVE_TICKER_PENDIENTE, None)
+    col_txt, col_btn = st.columns([5, 1])
+    with col_txt:
+        ticker = st.text_input("Ticker", value=pendiente or st.session_state.get("ticker_input", ""),
+                               placeholder="Introduce el ticker (p. ej. AAPL, MELI, SAN.MC)",
+                               label_visibility="collapsed", key="ticker_input")
+    with col_btn:
+        pulsado = st.button("Analizar", type="primary", width="stretch", icon=":material/query_stats:")
+
+    if pulsado or pendiente:
+        objetivo = pendiente or ticker
+        with st.spinner(f"Analizando {objetivo.upper()}…"):
+            resultado = analizar(objetivo)
+        if resultado is None:
+            st.error(f"No se ha podido obtener histórico para «{objetivo.upper()}». Revisa el ticker.")
+            return
+        st.session_state[CLAVE_ANALISIS] = resultado
+        st.session_state.pop("rango_grafico", None)
+        if pendiente:
+            st.rerun()
+
+
+# ----------------------------------------------------------------- cabecera --
+def _divisa(a: dict) -> str:
+    return (a["precio"].valor or {}).get("divisa") or (a["info"].valor or {}).get("currency") or ""
+
+
+def _cabecera(a: dict) -> None:
+    info = a["info"].valor or {}
+    precio = a["precio"].valor or {}
+    ticker = a["ticker"]
+    nombre = info.get("longName") or info.get("shortName") or TEXTO_ND
+    sector = info.get("sector") or TEXTO_ND
+    industria = info.get("industry")
+
+    c_izq, c_precio, c_fav = st.columns([3, 2, 1.2])
+    with c_izq:
+        st.markdown('<div class="ss-etiqueta">Ticker analizado</div>', unsafe_allow_html=True)
+        st.markdown(f'<div class="ss-ticker">{ticker}</div>', unsafe_allow_html=True)
+        st.markdown(f'<div class="ss-empresa">{ui.escapar(nombre)}</div>', unsafe_allow_html=True)
+        st.markdown(f'<div class="ss-sector">{sector}' + (f" · {industria}" if industria else "") + "</div>",
+                    unsafe_allow_html=True)
+    with c_precio:
+        st.markdown('<div class="ss-etiqueta">Precio actual de cotización</div>', unsafe_allow_html=True)
+        p = precio.get("precio") if precio else a["indicadores"].get("precio")
+        var = precio.get("variacion_pct") if precio else None
+        var_html = ""
+        if es_dato(var):
+            clase = "ss-var-pos" if var >= 0 else "ss-var-neg"
+            var_html = f'<span class="ss-var {clase}">{ui.fmt_pct(var)}</span>'
+        st.markdown(f'<div class="ss-precio">{ui.escapar(ui.fmt_precio(p, _divisa(a)))}{var_html}</div>',
+                    unsafe_allow_html=True)
+        ui.frescura(a["precio"].obtenido_en if a["precio"].ok else None, a["precio"].fuente, "precio")
+    with c_fav:
+        es_fav = db_supabase.es_favorito(ticker)
+        clave = "btn_favorito_on" if es_fav else "btn_favorito_off"
+        if st.button("★" if es_fav else "☆", key=clave,
+                     help="Quitar de Favoritos" if es_fav else "Añadir a Favoritos"):
+            db_supabase.alternar_favorito(ticker)
+            st.rerun()
+        if not db_supabase.disponible():
+            st.caption("Sin Supabase: favoritos solo en esta sesión")
+
+
+# --------------------------------------------------------- bloque 2: contexto --
+def _descripcion(a: dict) -> None:
+    info = a["info"].valor or {}
+    original = info.get("longBusinessSummary")
+    if not original:
+        ui.nd("Descripción no disponible")
+        return
+    traducida = datos_traduccion.traducir(a["ticker"], original)
+    texto = traducida or original
+    st.markdown(f'<div style="font-size:.84rem;line-height:1.5">{ui.escapar(texto)}</div>',
+                unsafe_allow_html=True)
+    if traducida is None:
+        st.markdown('<div class="ss-anotacion">Traducción no disponible; se muestra el texto original.</div>',
+                    unsafe_allow_html=True)
+
+
+def _noticias(a: dict) -> None:
+    st.markdown('<div class="ss-racha-tit">Últimas noticias</div>', unsafe_allow_html=True)
+    noticias = a["noticias"].valor
+    if not noticias:
+        ui.nd(f"Sin noticias disponibles ({ui.escapar(a['noticias'].fuente)})")
+        return
+    for n in noticias:
+        st.markdown(
+            f'<div class="ss-noticia"><a href="{n["url"]}" target="_blank">{ui.escapar(n["titular"])}</a>'
+            f'<br><small>{n["fecha"]:%d/%m/%Y} · {ui.escapar(n["fuente"])}</small></div>',
+            unsafe_allow_html=True,
+        )
+
+
+def _earnings(a: dict) -> None:
+    st.markdown('<div class="ss-racha-tit" style="margin-top:.6rem">Últimos resultados</div>',
+                unsafe_allow_html=True)
+    e = a["earnings"].valor
+    divisa = a["fundamentales"].get("divisa")
+    fuentes = (e or {}).get("fuentes") or {}
+    if not e or not e.get("pasados"):
+        motivo = ((e or {}).get("errores") or {}).get("finnhub") or a["earnings"].fuente
+        ui.nd(f"Resultados vs. consenso no disponibles ({ui.escapar(motivo)})")
+    else:
+        ultimo = e["pasados"][0]
+        s = ultimo["eps_sorpresa_pct"]
+        ui.metrica(f"BPA {ultimo['fecha']:%m/%Y}",
+                   f"{ui.fmt_num(ultimo['eps_real'])} vs {ui.fmt_num(ultimo['eps_est'])}",
+                   ui.fmt_pct(s), semaforo="bien" if es_dato(s) and s >= 0 else "mal" if es_dato(s) else None)
+        if es_dato(ultimo.get("rev_real")) or es_dato(ultimo.get("rev_est")):   # ingresos solo si alguna fuente los da
+            ui.metrica("Ingresos",
+                       f"{ui.fmt_importe(ultimo['rev_real'], divisa)} vs {ui.fmt_grande(ultimo['rev_est'])}",
+                       ui.fmt_pct(ultimo["rev_sorpresa_pct"]))
+        _racha(e["pasados"][:EARNINGS_TRIMESTRES])
+        if fuentes.get("pasados"):
+            st.markdown(f'<div class="ss-anotacion">Histórico: {fuentes["pasados"]}</div>', unsafe_allow_html=True)
+    proximo = (e or {}).get("proximo")
+    if proximo:
+        # Una fecha sin confirmar por la empresa se dice: el estándar de
+        # fiabilidad de la app no admite enseñar una estimación como cierta.
+        eti = f"{proximo['fecha']:%d/%m/%Y}" + (f" ({proximo['hora']})" if proximo.get("hora") else "")
+        if proximo.get("estimada"):
+            eti += " · prevista, sin confirmar"
+        ref = f"BPA est. {ui.fmt_num(proximo.get('eps_est'))}" + (f" · {fuentes['proximo']}" if fuentes.get("proximo") else "")
+        ui.metrica("Próximo earnings", eti, ref)
+    else:
+        ui.metrica("Próximo earnings", TEXTO_ND)
+
+
+def _recomendaciones(a: dict) -> None:
+    """Distribución de recomendaciones del último mes (barra apilada), nº de
+    analistas, consenso y revisiones a 3 meses. Informativo: en el Timing
+    solo entra la revisión (core_analistas)."""
+    st.markdown('<div class="ss-racha-tit" style="margin-top:.6rem">Recomendación de analistas</div>',
+                unsafe_allow_html=True)
+    r = a.get("analistas")
+    if not r:
+        ui.nd(f"Sin recomendaciones de analistas ({ui.escapar(a['recomendaciones'].fuente)})")
+        return
+    etiqueta, color = r["consenso"] or ("—", C_TEXTO_TENUE)
+    st.markdown(f'<div class="ss-mini-cab"><span style="font-size:.86rem">{r["n"]} analistas · '
+                f'{r["ultimo"]["periodo"][:7]}</span>{ui.badge(etiqueta, color)}</div>', unsafe_allow_html=True)
+    tramos = "".join(
+        f'<div style="width:{r["pct"][k]:.1f}%;background:{ANALISTAS_COLORES[k]}" title="{ANALISTAS_ETIQUETAS[k]}: {r["ultimo"][k]}"></div>'
+        for k in core_analistas.CLAVES if r["ultimo"].get(k))
+    st.markdown(f'<div class="ss-barra" style="display:flex;height:12px">{tramos}</div>', unsafe_allow_html=True)
+    leyenda = " · ".join(f'<span style="color:{ANALISTAS_COLORES[k]};font-weight:600">{r["ultimo"][k]}</span> '
+                         f'{ANALISTAS_ETIQUETAS[k].lower()}' for k in core_analistas.CLAVES if r["ultimo"].get(k))
+    st.markdown(f'<div class="ss-anotacion">{leyenda}</div>', unsafe_allow_html=True)
+    rev = r.get("revision")
+    sem = "bien" if es_dato(rev) and rev > 0 else "mal" if es_dato(rev) and rev < 0 else None
+    ui.metrica("Revisiones", core_analistas.texto_revision(r) or TEXTO_ND, semaforo=sem)
+    st.markdown(f'<div class="ss-anotacion">Fuente: {ui.escapar(a["recomendaciones"].fuente)}. El nivel es informativo '
+                f'(el sell-side recomienda comprar de forma sistemática); en el Timing solo puntúa la revisión.</div>',
+                unsafe_allow_html=True)
+
+
+def _racha(pasados: list[dict]) -> None:
+    """Racha de sorpresas de BPA: verde si batió, rojo si falló."""
+    filas = ['<div class="ss-racha"><div class="ss-racha-fila ss-racha-cab">'
+             '<span>Trim.</span><span>Real</span><span>Est.</span><span>Sorpresa</span></div>']
+    for p in pasados:
+        s = p["eps_sorpresa_pct"]
+        color = "#10b981" if es_dato(s) and s >= 0 else ("#dc2626" if es_dato(s) else "#64748b")
+        filas.append(
+            f'<div class="ss-racha-fila"><span>{p["fecha"]:%m/%Y}</span>'
+            f'<span>{ui.fmt_num(p["eps_real"])}</span><span>{ui.fmt_num(p["eps_est"])}</span>'
+            f'<span style="color:{color};font-weight:600">{ui.fmt_pct(s)}</span></div>'
+        )
+    filas.append("</div>")
+    st.markdown("".join(filas), unsafe_allow_html=True)
+
+
+def _bloque_contexto(a: dict) -> None:
+    with ui.tarjeta("Descripción, noticias y últimos resultados"):
+        _descripcion(a)
+        st.markdown("")
+        _noticias(a)
+        _earnings(a)
+        _recomendaciones(a)
+        _historial(a)
+        fuente = a["noticias"].fuente if a["noticias"].ok else "yfinance"
+        ui.frescura(a["noticias"].obtenido_en, fuente.split(" (")[0] + " + yfinance", "noticias")
+
+
+# ---------------------------------------------------------- bloque 3: gráfico --
+def _serie_para_rango(a: dict, rango: str) -> tuple[pd.DataFrame, pd.Timestamp | None, bool]:
+    """(serie completa, inicio del recorte, con_medias). 1M/1A/MAX recortan
+    el histórico base ya en memoria; 1D/1S piden intradía (cacheado por cubo)
+    y no llevan medias diarias."""
+    df = a["historico"].valor
+    spec = RANGOS_GRAFICO.get(rango)
+    if spec is not None:
+        intra = obtener_intradia(a["ticker"], spec[0], spec[1], a["cubo"])
+        return (intra.valor, None, False) if intra.ok else (df, df.index[-1] - pd.Timedelta(days=7), True)
+    if rango in DIAS_RANGO:
+        return df, df.index[-1] - pd.Timedelta(days=DIAS_RANGO[rango]), True
+    return df, None, True
+
+
+def _bloque_grafico(a: dict) -> None:
+    with ui.tarjeta("Gráfico de cotización · MACD · fundamentales y análisis técnico"):
+        c_rango, c_toggle = st.columns([3, 1])
+        with c_rango:
+            rango = st.segmented_control("Rango", options=list(RANGOS_GRAFICO), key="rango_grafico",
+                                         default=RANGO_GRAFICO_DEFECTO, label_visibility="collapsed")
+        with c_toggle:
+            mostrar_plan = st.toggle("Plan DCA", value=False, key="toggle_plan",
+                                     disabled=a.get("plan") is None,
+                                     help="Superpone las 3 entradas (azul), 3 salidas (verde) y el stop (rojo) del plan")
+        df, inicio, con_medias = _serie_para_rango(a, rango or RANGO_GRAFICO_DEFECTO)
+        fig = ui_graficos.grafico_precio_macd(df, inicio, con_medias, a.get("plan"), mostrar_plan, _divisa(a))
+        st.plotly_chart(fig, width="stretch", config={"displayModeBar": False})
+        st.markdown('<div class="ss-anotacion">Línea de cierre por defecto; pulsa en la leyenda para '
+                    'mostrar u ocultar velas, línea y medias móviles.</div>', unsafe_allow_html=True)
+
+        ui_metricas.render(a["fundamentales"], a["indicadores"], a.get("referencias"))
+        ui.frescura(a["info"].obtenido_en if a["info"].ok else None,
+                    "yfinance (fundamentales: info + estados financieros)", "info")
+
+
+def _historial(a: dict) -> None:
+    """Histórico de veredictos del ticker (sesión 7): cada análisis
+    guardado (individual, rastreo o cron) como un punto; con el cron, un
+    valor de un índice activo tiene un punto por día."""
+    st.markdown('<div class="ss-racha-tit" style="margin-top:.6rem">Histórico de veredictos</div>',
+                unsafe_allow_html=True)
+    filas = db_supabase.historial_ticker(a["ticker"])
+    if len(filas) < 2:
+        ui.nd("Aún no hay histórico: hacen falta al menos dos análisis guardados de este valor"
+              + ("" if db_supabase.disponible() else " (sin Supabase no se guardan)") + ".")
+        return
+    colores = {etiqueta: color for etiqueta, color in VEREDICTOS.values()}
+    st.plotly_chart(ui_graficos.grafico_historial(filas, a["fundamentales"].get("divisa_cotizacion") or "", colores),
+                    width="stretch", config={"displayModeBar": False}, key=f"historial_{a['ticker']}")
+    cambios = sum(1 for f0, f1 in zip(filas, filas[1:]) if f0.get("veredicto") != f1.get("veredicto"))
+    origenes = {f.get("origen") or "individual" for f in filas}
+    st.markdown(f'<div class="ss-anotacion">{len(filas)} análisis desde {str(filas[0]["fecha_analisis"])[:10]} '
+                f'({", ".join(sorted(origenes))}) · {cambios} cambios de veredicto · último: '
+                f'<b>{filas[-1].get("veredicto") or "—"}</b> el {str(filas[-1]["fecha_analisis"])[:10]}. '
+                f'Puntos: veredicto de cada análisis sobre el precio; líneas punteadas: calidad y timing (0-100).</div>',
+                unsafe_allow_html=True)
+    with st.expander("Últimos análisis"):
+        df = pd.DataFrame([{
+            "Fecha": str(f["fecha_analisis"])[:10], "Origen": f.get("origen") or "individual",
+            "Veredicto": f.get("veredicto"), "Señal": f.get("senal_timing"), "Precio": f.get("precio"),
+            "Calidad": f.get("calidad"), "Upside %": f.get("upside_pct"), "Timing": f.get("timing"),
+            "Motor": f.get("motor_version"),
+        } for f in reversed(filas[-15:])])
+        st.dataframe(df, width="stretch", hide_index=True, column_config={
+            "Precio": st.column_config.NumberColumn(format="%.2f"), "Calidad": st.column_config.NumberColumn(format="%.0f"),
+            "Upside %": st.column_config.NumberColumn(format="%+.1f"), "Timing": st.column_config.NumberColumn(format="%.0f")})
+
+
+def _bloque_anotaciones(a: dict) -> None:
+    """Notas con fecha (sesión 6): cada nota se guarda como entrada propia
+    y se enseña con la fecha y hora en que se añadió en su cabecera."""
+    ticker = a["ticker"]
+    with ui.tarjeta("Anotaciones manuales"):
+        clave_texto = f"anotacion_nueva_{ticker}"
+        if st.session_state.pop(f"anotacion_limpiar_{ticker}", False):
+            st.session_state[clave_texto] = ""
+        texto = st.text_area("Nueva nota", key=clave_texto, height=90, label_visibility="collapsed",
+                             placeholder="Ideas, tesis, dudas sobre este valor… (la fecha se añade sola)")
+        c_btn, c_msg = st.columns([1, 3])
+        with c_btn:
+            if st.button("Añadir nota", key=f"guardar_nota_{ticker}", width="stretch", icon=":material/add:",
+                         disabled=not texto.strip()):
+                st.session_state[f"nota_guardada_{ticker}"] = db_supabase.anadir_anotacion(ticker, texto)
+                st.session_state[f"anotacion_limpiar_{ticker}"] = True
+                st.rerun()
+        with c_msg:
+            estado = st.session_state.pop(f"nota_guardada_{ticker}", None)
+            if estado is True:
+                st.caption("Nota guardada" + ("" if db_supabase.disponible() else " (solo en esta sesión)"))
+            elif estado is False:
+                st.caption("No se pudo guardar la nota")
+        notas = db_supabase.listar_anotaciones(ticker)
+        if not notas:
+            ui.nd("Sin notas para este valor.")
+            return
+        for n in notas:
+            try:
+                cuando = pd.Timestamp(n["creado_en"]).tz_convert("Europe/Madrid") if pd.Timestamp(n["creado_en"]).tzinfo \
+                    else pd.Timestamp(n["creado_en"])
+                fecha = f"{cuando:%d/%m/%Y · %H:%M}"
+            except Exception:
+                fecha = str(n.get("creado_en") or "")[:10]
+            c_nota, c_del = st.columns([8, 1])
+            with c_nota:
+                st.markdown(f'<div class="ss-nota-cab">{fecha}</div>'
+                            f'<div class="ss-nota-txt">{ui.escapar(n["texto"]).replace(chr(10), "<br>")}</div>',
+                            unsafe_allow_html=True)
+            with c_del:
+                if st.button("", key=f"nota_del_{ticker}_{n['id']}", icon=":material/delete:", help="Eliminar esta nota"):
+                    db_supabase.eliminar_anotacion(ticker, n["id"])
+                    st.rerun()
+
+
+# ------------------------------------------------------------------- render --
+def render() -> None:
+    _formulario()
+    a = st.session_state.get(CLAVE_ANALISIS)
+    if not a:
+        return
+
+    _cabecera(a)
+    st.markdown("")
+
+    col_ctx, col_graf = st.columns([1, 2])
+    with col_ctx:
+        _bloque_contexto(a)
+    with col_graf:
+        _bloque_grafico(a)
+        _bloque_anotaciones(a)
+
+    c4, c5, c6 = st.columns(3)
+    with c4:
+        ui_bloque_calidad_fv.render(a)
+    with c5:
+        ui_bloque_timing.render(a)
+    with c6:
+        ui_bloque_plan.render(a)
+    ui_bloque_peers.render(a)
