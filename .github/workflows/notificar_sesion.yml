@@ -1,0 +1,35 @@
+name: Notificar sesion por Telegram
+
+on:
+  push:
+    branches: [main]
+    paths:
+      - 'comite_inversion/sesiones/.ultimo_mensaje_telegram.txt'
+
+jobs:
+  notificar:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Enviar mensaje a Telegram
+        env:
+          TELEGRAM_TOKEN: ${{ secrets.TELEGRAM_TOKEN }}
+          TELEGRAM_CHAT_ID: ${{ secrets.TELEGRAM_CHAT_ID }}
+        run: |
+          set -e
+          if [ ! -s comite_inversion/sesiones/.ultimo_mensaje_telegram.txt ]; then
+            echo "Sin mensaje que enviar (archivo vacio o ausente)."
+            exit 0
+          fi
+          RESP=$(curl -s -w "\n%{http_code}" -X POST "https://api.telegram.org/bot${TELEGRAM_TOKEN}/sendMessage" \
+            -d chat_id="${TELEGRAM_CHAT_ID}" \
+            -d parse_mode=HTML \
+            -d disable_web_page_preview=true \
+            --data-urlencode "text@comite_inversion/sesiones/.ultimo_mensaje_telegram.txt")
+          echo "$RESP"
+          CODE=$(echo "$RESP" | tail -n1)
+          if [ "$CODE" != "200" ]; then
+            echo "Fallo al enviar a Telegram (HTTP $CODE)"
+            exit 1
+          fi

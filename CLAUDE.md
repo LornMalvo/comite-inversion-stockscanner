@@ -105,6 +105,21 @@ Cada sesión completa se guarda como `comite_inversion/sesiones/AAAA-MM-DD_sesio
 - El bug report de la sesión (si lo hubo) quedó guardado en `stockscanner/qa/bug_reports/`.
 - [empresas_analizadas.md](comite_inversion/cartera/empresas_analizadas.md) incluye cualquier ticker nuevo tratado en la sesión.
 - [registro_hallazgos.md](stockscanner/qa/registro_hallazgos.md) refleja los hallazgos nuevos de la auditoría de esta sesión y el estado actualizado de los anteriores si cambiaron.
+- Se escribió `comite_inversion/sesiones/.ultimo_mensaje_telegram.txt` (ver notificación por Telegram abajo) y todo quedó commiteado y empujado a `origin/main` (el push es lo que dispara la notificación).
+
+## Notificación por Telegram
+
+Cada sesión (manual o programada) debe terminar escribiendo el resumen de cierre en `comite_inversion/sesiones/.ultimo_mensaje_telegram.txt`, en texto plano con HTML básico de Telegram (solo `<b>negrita</b>`, sin markdown), con esta estructura:
+
+```
+<b>Comité de Inversión — AAAA-MM-DD</b>
+Candidatas tratadas: TICKER1, TICKER2, TICKER3
+<b>Veredicto de Inversión:</b> ticker seleccionado (o "ninguna"), precio de entrada, stop técnico y fundamental
+<b>Veredicto de Desarrollo:</b> 1-2 prioridades de StockScanner
+Sesión completa: https://github.com/LornMalvo/comite-inversion-stockscanner/blob/main/comite_inversion/sesiones/AAAA-MM-DD_sesion.md
+```
+
+Al hacer `git push` de ese archivo junto con el resto de la sesión, el workflow [.github/workflows/notificar_sesion.yml](.github/workflows/notificar_sesion.yml) lo envía automáticamente al Telegram configurado en los secretos del repositorio (`TELEGRAM_TOKEN`, `TELEGRAM_CHAT_ID` — nunca en texto plano en ningún archivo del repo). El texto debe respetar el límite de 4096 caracteres de Telegram: es un resumen, no la sesión completa.
 
 ## Reglas generales
 
