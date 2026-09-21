@@ -1,2 +1,5 @@
-<b>[PRUEBA DE INFRAESTRUCTURA]</b>
-Tercer intento tras instalar la GitHub App en la organizacion. Si ves este mensaje, el pipeline completo funciona de extremo a extremo.
+<b>Comité de Inversión — 2026-09-21</b>
+Candidatas tratadas: MA (Mastercard), BTI (British American Tobacco), 8001.T (ITOCHU)
+<b>Veredicto de Inversión:</b> ninguna. Las 3 fallan al menos una pata de calidad+valor+momentum (MA: momentum negativo; BTI: ROIC bajo y señal de sobrevaloración contradictoria; ITOCHU: ROIC no fiable y descuento solo moderado). Pasan a watchlist. MU sigue en cartera sin cambios, pendiente de ejecución $950-970, stop técnico &lt;$880, stop fundamental: guía de márgenes a la baja (resultados 30-sep) o ROIC &lt;15-20% dos trimestres.
+<b>Veredicto de Desarrollo:</b> 1) generalizar la conversión de divisa de StockScanner más allá de EUR/USD (afecta hoy a BTI en GBP y a ITOCHU en JPY, que muestran "EUR n/d" en toda la app). 2) siguen abiertos los bugs Altos heredados: stop del Plan DCA sin tope ATR/N3, y P/FFO no-TTM en REITs.
+Sesión completa: https://github.com/LornMalvo/comite-inversion-stockscanner/blob/main/comite_inversion/sesiones/2026-09-21_sesion.md
