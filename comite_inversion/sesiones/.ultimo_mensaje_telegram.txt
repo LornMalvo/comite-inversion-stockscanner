@@ -1,5 +1,5 @@
-<b>Comité de Inversión — 2026-09-21</b>
-Candidatas tratadas: MA (Mastercard), BTI (British American Tobacco), 8001.T (ITOCHU)
-<b>Veredicto de Inversión:</b> ninguna. Las 3 fallan al menos una pata de calidad+valor+momentum (MA: momentum negativo; BTI: ROIC bajo y señal de sobrevaloración contradictoria; ITOCHU: ROIC no fiable y descuento solo moderado). Pasan a watchlist. MU sigue en cartera sin cambios, pendiente de ejecución $950-970, stop técnico &lt;$880, stop fundamental: guía de márgenes a la baja (resultados 30-sep) o ROIC &lt;15-20% dos trimestres.
-<b>Veredicto de Desarrollo:</b> 1) generalizar la conversión de divisa de StockScanner más allá de EUR/USD (afecta hoy a BTI en GBP y a ITOCHU en JPY, que muestran "EUR n/d" en toda la app). 2) siguen abiertos los bugs Altos heredados: stop del Plan DCA sin tope ATR/N3, y P/FFO no-TTM en REITs.
-Sesión completa: https://github.com/LornMalvo/comite-inversion-stockscanner/blob/main/comite_inversion/sesiones/2026-09-21_sesion.md
+<b>Comité de Inversión — 2026-09-23</b>
+Candidatas tratadas: ADBE (Adobe), PRX (Prosus), 005930.KS (Samsung Electronics)
+<b>Veredicto de Inversión:</b> ninguna incorporada. ADBE: foso y descuento sólidos pero fuerza relativa negativa en el año. PRX: descuento a NAV real y momentum verificado, pero ROIC del activo dominante (Tencent, 13,53%) no es "alto". Samsung: catalizador y momentum los más fuertes, pero margen operativo en pico cíclico de 40 años y duplicaría la exposición del comité al mismo tema de memoria/HBM que MU (pendiente de ejecución en $950-970, sin cambios).
+<b>Veredicto de Desarrollo:</b> 1) verificar de inmediato si los workflows de cron (rastreo/alertas) están realmente en `.github/workflows/` de la raíz — de no estarlo, el rastreo nocturno y las alertas nunca se ejecutan en producción (hallazgo Alta). 2) Añadir validación cruzada de fundamentales entre fuentes (yfinance/Finnhub), motivada por la discrepancia de ROIC de ADBE (22% vs 59-61%) que el comité tuvo que reconciliar manualmente hoy.
+Sesión completa: https://github.com/LornMalvo/comite-inversion-stockscanner/blob/main/comite_inversion/sesiones/2026-09-23_sesion.md
