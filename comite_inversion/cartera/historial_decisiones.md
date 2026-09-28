@@ -50,6 +50,18 @@
 - **Razonamiento resumido:** única candidata donde ninguna de las tres patas de la triple condición requiere un acto de fe del propio proponente. Calidad (ROIC ~28-30%, margen operativo 66,88%, deuda neta/EBITDA 0,35x), valor (13,5% de descuento vs GF Value, el más ajustado de los tres pero sin datos en disputa) y momentum (ruptura confirmada de resistencia en $356 tras meses de rango lateral) se refuerzan sin admisiones de fallo. LVMH descartada porque su propio proponente (Analista 2) reconoció explícitamente que "no cumple el criterio de momentum en su forma más exigente" (-35,8% YTD, sin ruptura, bajo SMA50/SMA200), pese a tener el mayor descuento de valor (25-32%). Alphabet descartada porque su propio proponente (Analista 3) admitió que no hay confirmación de volumen institucional en el nivel técnico actual, y porque presenta FCF trimestral negativo y deuda neta positiva por primera vez en 11 años — "riesgo real, no solo percepción" según el propio analista. Forzar una compra en LVMH o Alphabet hoy habría sido contrario al principio de rigor del comité. MU sigue en cartera sin cambios, pendiente de ejecución en $950-970.
 - **Enlace a la sesión completa:** [comite_inversion/sesiones/2026-09-25_sesion.md](../sesiones/2026-09-25_sesion.md)
 
+## 2026-09-28 — Sesión 5
+
+- **Candidatas debatidas:** Salesforce, Inc. (CRM), Novo Nordisk A/S (NVO), Tencent Holdings Limited (0700.HK/TCEHY)
+- **Decisión:** Esperar (ninguna incorporada a cartera; las 3 pasan a watchlist)
+- **Empresa seleccionada:** Ninguna
+- **Precio de entrada ideal:** N/A
+- **Soporte clave:** N/A
+- **Stop loss técnico:** N/A
+- **Stop loss fundamental:** N/A
+- **Razonamiento resumido:** las tres candidatas fallan al menos una pata de la triple condición, admitido por su propio proponente o establecido por precedente directo del comité. CRM: el ROIC (~10-11%) es "la principal debilidad cuantitativa de la tesis" (propio Analista 1), patrón similar al de BTI (ROIC 9,68%, rechazada 21-sep-2026); momentum "en formación, no ruptura confirmada con volumen contundente". NVO: momentum admitido explícitamente como "la pata más débil de las tres... no hay ruptura alcista confirmada" (propio Analista 2), mismo patrón por el que se rechazó LVMH el 25-sep-2026; además ROIC en caída sostenida de ~34% (2023) a ~18,6% (jun-2026). TCEHY: "no hay fuerza relativa positiva confirmada... zona de soporte, no breakout" (propio Analista 3), con vendedores netos institucionales de China continental 3 meses seguidos; su ROIC (13,54%) es prácticamente idéntico al de Tencent como activo de Prosus (13,53%), que este mismo comité usó para rechazar PRX el 23-sep-2026 por no ser "alto" — sin base nueva para aplicar hoy un estándar distinto. Alerta operativa adicional del Agente 4: el sufijo `.HK` de Tencent no está cubierto por la normalización de tickers de StockScanner (hallazgo #20) y ningún cron de alertas corre hoy en producción real (hallazgo #12). Forzar cualquiera de las tres hoy habría sido contrario al principio de rigor del comité. MU y V siguen en cartera sin cambios, pendientes de ejecución.
+- **Enlace a la sesión completa:** [comite_inversion/sesiones/2026-09-28_sesion.md](../sesiones/2026-09-28_sesion.md)
+
 ## [AAAA-MM-DD] — Sesión
 
 - **Candidatas debatidas:** [ ]
