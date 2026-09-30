@@ -1,5 +1,5 @@
-<b>Comité de Inversión — 2026-09-28</b>
-Candidatas tratadas: CRM (Salesforce), NVO (Novo Nordisk), 0700.HK/TCEHY (Tencent)
-<b>Veredicto de Inversión:</b> ninguna incorporada (Esperar). CRM falla Calidad (ROIC ~10-11%, admitido como debilidad principal); NVO falla Momentum (admitido como "la pata más débil", ROIC cayendo 34%→18,6% desde 2023); TCEHY falla Momentum (sin ruptura confirmada, vendedores netos institucionales) y su ROIC 13,54% es el mismo que este comité ya usó para rechazar Prosus el 23-sep. Las tres pasan a watchlist. MU y V siguen pendientes de ejecución sin cambios.
-<b>Veredicto de Desarrollo:</b> 1) Corregir el workflow rastreo.yml antes de activarlo: le faltan TELEGRAM_TOKEN/TELEGRAM_CHAT_ID (hallazgo #23, alta) — fallaría en silencio. 2) core_indicadores.rsi() devuelve NaN en rachas alcistas puras en vez de 100 (hallazgo #24, media), ocultando sobrecompra extrema real.
-Sesión completa: https://github.com/LornMalvo/comite-inversion-stockscanner/blob/main/comite_inversion/sesiones/2026-09-28_sesion.md
+<b>Comité de Inversión — 2026-09-30</b>
+Candidatas tratadas: LPLA, AEM, ERO
+<b>Veredicto de Inversión:</b> AEM (Agnico Eagle Mines) seleccionada. Entrada $180-$190 (50/50 escalonado, confirmación sobre $193-$201). Stop técnico: cierre &lt;$170. Stop fundamental: oro &lt;$3.000-3.300/oz 2+ trimestres, incidente operativo que retrase Canadian Malartic, o reversión de caja neta a deuda relevante.
+<b>Veredicto de Desarrollo:</b> (1) Seguimiento activo y cuantificado de las condiciones de invalidación de tesis (hoy texto estático, nunca revisado contra datos nuevos); (2) detector de divergencias RSI/MACD vs. precio como nuevo componente de Timing. Sin hallazgos nuevos de bugs (código sin cambios desde 19-sep, cobertura 100% confirmada).
+Sesión completa: https://github.com/LornMalvo/comite-inversion-stockscanner/blob/main/comite_inversion/sesiones/2026-09-30_sesion.md
