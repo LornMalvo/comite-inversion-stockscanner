@@ -1,5 +1,5 @@
-<b>Comité de Inversión — 2026-10-02</b>
-Candidatas tratadas: ACN, MUV2.DE
-<b>Veredicto de Inversión:</b> ACN (Accenture) seleccionada — señal de alta convicción (2 analistas independientes). Entrada 50/50: mitad en $198-205, mitad condicionada a cierre &gt;$213 con volumen o pullback sobre $195. Stop técnico: cierre &lt;$183 (fijado a mano por bug de la app, ver abajo). Stop fundamental: desaceleración de bookings 2+ trimestres, ROIC &lt;15% sostenido, o pérdida de caja neta. MUV2.DE (Munich Re) a watchlist: momentum negativo admitido (-11,2% YTD vs sector).
-<b>Veredicto de Desarrollo:</b> (1) Bug nuevo de severidad alta (#26): el stop-loss de core_plan_dca.py puede arriesgar más del 25% anunciado sin avisar — corregido el orden de los topes es la prioridad antes de la próxima sesión con posición nueva; (2) construir el módulo de backtesting que la app anuncia en sus propios docstrings desde el inicio pero nunca implementó.
-Sesión completa: https://github.com/LornMalvo/comite-inversion-stockscanner/blob/main/comite_inversion/sesiones/2026-10-02_sesion.md
+<b>Comité de Inversión — 2026-10-05</b>
+Candidatas tratadas: UCG.MI (UniCredit), 105560.KS/KB (KB Financial Group), HONA (Honeywell Aerospace)
+<b>Veredicto de Inversión:</b> ninguna seleccionada. UCG.MI: margen de seguridad frente a DCF modesto (~5-7%, cerca de máximo de 16,5 años). KB: ROE moderado (12,78%→10,6% consenso 2026E) y precio no verificable en tiempo real (último dato 31-ago). HONA: deuda neta/EBITDA ~4,4-4,5x "elevada, no controlada", momentum sin confirmar. Las tres pasan a watchlist; cartera (MU, V, AEM, ACN) sin cambios.
+<b>Veredicto de Desarrollo:</b> 1) corregir hallazgo #27 (alta): agrupador de pivotes en core_confluencia.py funde en cadena niveles técnicos no relacionados, distorsionando los niveles de entrada/salida del plan DCA. 2) nueva señal de Timing por ruptura confirmada de zona de confluencia (brecha directa con lo que exige la metodología del comité).
+Sesión completa: https://github.com/LornMalvo/comite-inversion-stockscanner/blob/main/comite_inversion/sesiones/2026-10-05_sesion.md
