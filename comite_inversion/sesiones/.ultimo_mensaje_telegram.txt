@@ -1,5 +1,5 @@
-<b>Comité de Inversión — 2026-10-05</b>
-Candidatas tratadas: UCG.MI (UniCredit), 105560.KS/KB (KB Financial Group), HONA (Honeywell Aerospace)
-<b>Veredicto de Inversión:</b> ninguna seleccionada. UCG.MI: margen de seguridad frente a DCF modesto (~5-7%, cerca de máximo de 16,5 años). KB: ROE moderado (12,78%→10,6% consenso 2026E) y precio no verificable en tiempo real (último dato 31-ago). HONA: deuda neta/EBITDA ~4,4-4,5x "elevada, no controlada", momentum sin confirmar. Las tres pasan a watchlist; cartera (MU, V, AEM, ACN) sin cambios.
-<b>Veredicto de Desarrollo:</b> 1) corregir hallazgo #27 (alta): agrupador de pivotes en core_confluencia.py funde en cadena niveles técnicos no relacionados, distorsionando los niveles de entrada/salida del plan DCA. 2) nueva señal de Timing por ruptura confirmada de zona de confluencia (brecha directa con lo que exige la metodología del comité).
-Sesión completa: https://github.com/LornMalvo/comite-inversion-stockscanner/blob/main/comite_inversion/sesiones/2026-10-05_sesion.md
+<b>Comité de Inversión — 2026-10-07</b>
+Candidatas tratadas: UNH, PEP, MRK
+<b>Veredicto de Inversión:</b> ninguna seleccionada. UNH: valor moderado (4-12%) y calidad en deterioro (FCF -5,2% CAGR, apalancamiento 1,3x→2,2x). PEP: momentum "Strong Sell", sin ruptura. MRK: momentum fuerte (+22% YTD) pero valor débil (0-20% según método, precio pegado al consenso). Cartera sin cambios: MU, V, AEM, ACN siguen pendientes de ejecución.
+<b>Veredicto de Desarrollo:</b> 1) Corregir hallazgo #28 (alta): en core_fair_value._banda_cordura() el ancla de exclusión se autocontamina con el propio método juzgado, por lo que con baja cobertura de métodos un valor disparatado nunca se marca "excluido" (solo "recortado"), afectando justo al cálculo de Fair Value de candidatas como MRK hoy. 2) Primer test unitario real del proyecto, fijando ese bug como regresión permanente.
+Sesión completa: https://github.com/LornMalvo/comite-inversion-stockscanner/blob/main/comite_inversion/sesiones/2026-10-07_sesion.md
