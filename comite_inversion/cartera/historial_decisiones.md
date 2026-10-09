@@ -110,6 +110,18 @@
 - **Razonamiento resumido:** las tres candidatas fallan al menos una pata de la triple condición, en cada caso admitido explícitamente por su propio proponente. UNH: calidad históricamente alta (foso de escala + Optum) pero en deterioro verificable (FCF CAGR -5,2% 2021-2025, apalancamiento neto/EBITDA 1,3x→2,2x en un año) y valor moderado (descuento ~4-12% vs consenso, "no significativo"); el propio Analista 1 admite que valor y calidad son ambos puntos débiles. PEP: calidad "buena, no excepcional" (Dividend King con 54 años, pero ROIC con ligera tendencia a la baja) y valor real pero moderado (DCF conservador con margen de seguridad escaso, ~0-10%), pero el propio Analista 2 declara sin rodeos que el momentum es la pata más débil — señal técnica "Strong Sell" consolidada sin ruptura ni flujo institucional confirmado. MRK: el único con momentum genuinamente fuerte y verificado (+22% YTD vs +13% S&P 500 y +6,1% del propio sector salud), pero el propio Analista 3 admite que el valor es la pata más débil (descuento 0-20% según método, precio ya pegado al consenso de analistas tras +90% desde mínimos de 52 semanas); el hallazgo #28 del Agente 4 (bug en `core_fair_value._banda_cordura()` que nunca excluye un método disparatado cuando la cobertura de métodos es baja, justo el escenario de MRK) añade cautela adicional sobre la fiabilidad de ese número si se calculara con StockScanner tal cual está hoy. Forzar la incorporación de cualquiera de las tres hoy habría sido contrario al principio de rigor del comité. MU, V, AEM y ACN siguen en cartera sin cambios, pendientes de ejecución.
 - **Enlace a la sesión completa:** [comite_inversion/sesiones/2026-10-07_sesion.md](../sesiones/2026-10-07_sesion.md)
 
+## 2026-10-09 — Sesión 10
+
+- **Candidatas debatidas:** Berkshire Hathaway Inc. (BRK.B), Eli Lilly and Company (LLY). El Analista 1 no propuso ninguna candidata tras evaluar 17 empresas sin encontrar una que sostuviera la triple condición.
+- **Decisión:** Esperar (ninguna incorporada a cartera; las 2 candidatas pasan a watchlist)
+- **Empresa seleccionada:** Ninguna
+- **Precio de entrada ideal:** N/A
+- **Soporte clave:** N/A
+- **Stop loss técnico:** N/A
+- **Stop loss fundamental:** N/A
+- **Razonamiento resumido:** ninguna de las dos candidatas sostiene la triple condición sin una grieta admitida por su propio proponente. BRK.B: balance de caja neta (~359.000 M$) y descuento razonable (~15-20%) vs. suma de partes, pero fuerza relativa negativa vs. S&P 500 en el año (infraponderación ~13-15 puntos), admitida sin rodeos por el Analista 2 como la pata más débil; además varias cifras clave (CAGR ingresos/FCF, precio actual) no se pudieron verificar con fuente fechada a hoy. LLY: ROIC ~42% y ruptura confirmada a máximos históricos, pero el propio Analista 3 admite que el valor es la pata más débil — dispersión de Fair Value de ~$600/acción entre métodos y un análisis bajista independiente que la ve sobrevalorada, el mismo patrón exacto por el que se rechazó a MRK el 2026-10-07. El hallazgo #28 del Agente 4 (banda de cordura que nunca excluye un método disparatado con baja cobertura) añade cautela adicional sobre la fiabilidad del Fair Value de ambas si se recalculara con StockScanner tal cual está hoy. Forzar la incorporación de cualquiera de las dos hoy habría sido contrario al principio de rigor del comité. MU, V, AEM y ACN siguen en cartera sin cambios, pendientes de ejecución.
+- **Enlace a la sesión completa:** [comite_inversion/sesiones/2026-10-09_sesion.md](../sesiones/2026-10-09_sesion.md)
+
 ## [AAAA-MM-DD] — Sesión
 
 - **Candidatas debatidas:** [ ]

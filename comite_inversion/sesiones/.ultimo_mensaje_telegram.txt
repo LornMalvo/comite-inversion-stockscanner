@@ -1,5 +1,5 @@
-<b>Comité de Inversión — 2026-10-07</b>
-Candidatas tratadas: UNH, PEP, MRK
-<b>Veredicto de Inversión:</b> ninguna seleccionada. UNH: valor moderado (4-12%) y calidad en deterioro (FCF -5,2% CAGR, apalancamiento 1,3x→2,2x). PEP: momentum "Strong Sell", sin ruptura. MRK: momentum fuerte (+22% YTD) pero valor débil (0-20% según método, precio pegado al consenso). Cartera sin cambios: MU, V, AEM, ACN siguen pendientes de ejecución.
-<b>Veredicto de Desarrollo:</b> 1) Corregir hallazgo #28 (alta): en core_fair_value._banda_cordura() el ancla de exclusión se autocontamina con el propio método juzgado, por lo que con baja cobertura de métodos un valor disparatado nunca se marca "excluido" (solo "recortado"), afectando justo al cálculo de Fair Value de candidatas como MRK hoy. 2) Primer test unitario real del proyecto, fijando ese bug como regresión permanente.
-Sesión completa: https://github.com/LornMalvo/comite-inversion-stockscanner/blob/main/comite_inversion/sesiones/2026-10-07_sesion.md
+<b>Comité de Inversión — 2026-10-09</b>
+Candidatas tratadas: BRK.B, LLY (el Analista 1 no propuso ninguna tras evaluar 17 empresas sin triple condición)
+<b>Veredicto de Inversión:</b> ninguna — BRK.B tiene balance de caja neta y descuento ~15-20% pero momentum negativo vs. S&amp;P 500; LLY tiene ROIC ~42% y ruptura a máximos pero valor disperso ($600/acción entre métodos), mismo patrón que rechazó a MRK el 07-oct. Ambas a watchlist. MU, V, AEM y ACN sin cambios.
+<b>Veredicto de Desarrollo:</b> corregir hallazgo #29 (core_fundamentales.ffo_por_accion trata D&amp;A=0.0 como ausente, afecta Fair Value de REITs) con helper primero_valido(); evaluar diseño de módulo de backtesting histórico (core_backtest.py) para validar pesos de Calidad/Timing.
+Sesión completa: https://github.com/LornMalvo/comite-inversion-stockscanner/blob/main/comite_inversion/sesiones/2026-10-09_sesion.md
