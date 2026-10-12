@@ -1,5 +1,5 @@
-<b>Comité de Inversión — 2026-10-09</b>
-Candidatas tratadas: BRK.B, LLY (el Analista 1 no propuso ninguna tras evaluar 17 empresas sin triple condición)
-<b>Veredicto de Inversión:</b> ninguna — BRK.B tiene balance de caja neta y descuento ~15-20% pero momentum negativo vs. S&amp;P 500; LLY tiene ROIC ~42% y ruptura a máximos pero valor disperso ($600/acción entre métodos), mismo patrón que rechazó a MRK el 07-oct. Ambas a watchlist. MU, V, AEM y ACN sin cambios.
-<b>Veredicto de Desarrollo:</b> corregir hallazgo #29 (core_fundamentales.ffo_por_accion trata D&amp;A=0.0 como ausente, afecta Fair Value de REITs) con helper primero_valido(); evaluar diseño de módulo de backtesting histórico (core_backtest.py) para validar pesos de Calidad/Timing.
-Sesión completa: https://github.com/LornMalvo/comite-inversion-stockscanner/blob/main/comite_inversion/sesiones/2026-10-09_sesion.md
+<b>Comité de Inversión — 2026-10-12</b>
+Candidatas tratadas: ninguna propuesta formalmente (25 tickers investigados y descartados por los 3 analistas: FICO, DEO/DGE.L, ASML, NKE, ODFL, CPRT, TRU, MDLZ, VEEV, BABA, 8058.T, FFH.TO, FCX, SCCO, HNR1.DE, SREN.SW, CFR.SW, PDD, QCOM, PYPL, 7974.T, FLUT, BA.L, LLOY.L, COF)
+<b>Veredicto de Inversión:</b> ninguna — primera sesión con las 3 patas de los 3 analistas vacías. Patrón repetido: descuento sin calidad/momentum verificable (FICO, PDD, BABA) o calidad/momentum genuinos sin margen de seguridad (VEEV, LLOY.L). Sin entrada, sin stops. MU, V, AEM y ACN sin cambios.
+<b>Veredicto de Desarrollo:</b> 1) conectar el stop fundamental (core_plan_dca.invalidacion) a vigilancia activa en el cron nocturno — hoy se calcula una vez y nunca se revisa (hallazgo #30, Alta). 2) Reclasificar #6 a Alta: las 44 funciones de db_supabase.py tragan errores en silencio, incluida cartera real y diario de decisiones.
+Sesión completa: https://github.com/LornMalvo/comite-inversion-stockscanner/blob/main/comite_inversion/sesiones/2026-10-12_sesion.md

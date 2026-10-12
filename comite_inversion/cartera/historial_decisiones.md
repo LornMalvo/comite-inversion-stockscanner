@@ -122,6 +122,18 @@
 - **Razonamiento resumido:** ninguna de las dos candidatas sostiene la triple condición sin una grieta admitida por su propio proponente. BRK.B: balance de caja neta (~359.000 M$) y descuento razonable (~15-20%) vs. suma de partes, pero fuerza relativa negativa vs. S&P 500 en el año (infraponderación ~13-15 puntos), admitida sin rodeos por el Analista 2 como la pata más débil; además varias cifras clave (CAGR ingresos/FCF, precio actual) no se pudieron verificar con fuente fechada a hoy. LLY: ROIC ~42% y ruptura confirmada a máximos históricos, pero el propio Analista 3 admite que el valor es la pata más débil — dispersión de Fair Value de ~$600/acción entre métodos y un análisis bajista independiente que la ve sobrevalorada, el mismo patrón exacto por el que se rechazó a MRK el 2026-10-07. El hallazgo #28 del Agente 4 (banda de cordura que nunca excluye un método disparatado con baja cobertura) añade cautela adicional sobre la fiabilidad del Fair Value de ambas si se recalculara con StockScanner tal cual está hoy. Forzar la incorporación de cualquiera de las dos hoy habría sido contrario al principio de rigor del comité. MU, V, AEM y ACN siguen en cartera sin cambios, pendientes de ejecución.
 - **Enlace a la sesión completa:** [comite_inversion/sesiones/2026-10-09_sesion.md](../sesiones/2026-10-09_sesion.md)
 
+## 2026-10-12 — Sesión 11
+
+- **Candidatas debatidas:** Ninguna llegó a proponerse formalmente al comité. Los tres analistas investigaron 25 tickers únicos de forma independiente (Analista 1: FICO, DEO/DGE.L, ASML, NKE, ODFL, CPRT, TRU, MDLZ, VEEV; Analista 2: BABA, 8058.T, FFH.TO, FCX, SCCO, HNR1.DE, SREN.SW, CFR.SW, PDD; Analista 3: QCOM, BABA, PYPL, 7974.T, FLUT, BA.L, CFR.SW, LLOY.L, COF) y ninguno cumplió la triple condición (calidad + valor + momentum) con datos verificables.
+- **Decisión:** Esperar (ninguna candidata incorporada ni a watchlist formal de Fase 3, porque ninguna llegó a proponerse)
+- **Empresa seleccionada:** Ninguna
+- **Precio de entrada ideal:** N/A
+- **Soporte clave:** N/A
+- **Stop loss técnico:** N/A
+- **Stop loss fundamental:** N/A
+- **Razonamiento resumido:** primera sesión del comité en la que los tres analistas, trabajando de forma independiente y sin solaparse en su mayoría (con la excepción orgánica de BABA y CFR.SW/Richemont, investigados por dos analistas distintos y rechazados por motivos convergentes — ROIC/momentum insuficientes y sobrevaloración frente a DCF, respectivamente), no encontraron ninguna candidata que sostuviera simultáneamente las tres patas. Patrón detectado en el debate (Fase 3): las candidatas con descuento de valor aparente (FICO, PDD, BABA, FCX) fallan en calidad (ROIC bajo, deuda no reconciliada) o en momentum (sin ruptura confirmada, tendencia técnica negativa); las que muestran momentum/catalizador genuino y reciente (VEEV, LLOY.L, SCCO) ya cotizan en línea con el consenso o DCF de terceros, sin margen de seguridad real; y las de calidad indiscutible (ASML, Hannover Re, Swiss Re) no ofrecen ningún descuento verificable. Forzar una incorporación hoy habría sido contrario al principio de rigor del comité — se prefiere no proponer antes que proponer con una pata débil. El Agente 4 (QA) encontró además un hallazgo nuevo de severidad alta (#30: el stop loss fundamental que calcula y muestra la app nunca se vuelve a comprobar tras la decisión inicial) y amplió el alcance del hallazgo #6 a severidad Alta (afecta a las 44 funciones de `db_supabase.py`, no solo a 2). MU, V, AEM y ACN siguen en cartera sin cambios, pendientes de ejecución.
+- **Enlace a la sesión completa:** [comite_inversion/sesiones/2026-10-12_sesion.md](../sesiones/2026-10-12_sesion.md)
+
 ## [AAAA-MM-DD] — Sesión
 
 - **Candidatas debatidas:** [ ]
