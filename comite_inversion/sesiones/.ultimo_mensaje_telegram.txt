@@ -1,5 +1,5 @@
-<b>Comité de Inversión — 2026-10-14</b>
-Candidatas tratadas: MCO, EW, VRSN, AXP, CSU.TO, CME, NOVOB.CO, HSY, TMO, ELV, TEP.PA, JD, FI, LULU, YUMC, BBVA, 6690.HK, RB, GLW, CSCO, SK Hynix, ASMI, VRT, 6146.T, RR.L, GEV, GAW.L, Q, KDP, SPOT (ninguna propuesta formalmente — ninguna cumple calidad+valor+momentum a la vez)
-<b>Veredicto de Inversión:</b> ninguna. Tercera sesión en cinco sin candidata propuesta. Cartera sin cambios: MU, V, AEM y ACN siguen pendientes de ejecución con sus niveles ya fijados.
-<b>Veredicto de Desarrollo:</b> 1) Nueva función de re-chequeo automático contra empresas_analizadas.md antes de investigar un ticker (evita repetir análisis ya descartados, como casi ocurrió hoy con Nintendo). 2) Generar automáticamente la ficha de candidata desde el análisis de la app, para que ninguna cifra citada en sesión difiera de lo que el motor calculó.
-Sesión completa: https://github.com/LornMalvo/comite-inversion-stockscanner/blob/main/comite_inversion/sesiones/2026-10-14_sesion.md
+<b>Comité de Inversión — 2026-10-16</b>
+Candidatas tratadas: ninguna propuesta formalmente (28 tickers investigados y descartados: OR.PA, WEGE3.SA, ADM.L, CSL.AX, BAP, POW.TO, DHR, ANTO.L, HLN, ATD.TO, DOL.TO, CCJ, B3SA3 y otros 15 más)
+<b>Veredicto de Inversión:</b> ninguna (3ª sesión consecutiva sin candidata que cumpla calidad+valor+momentum). Cartera sin cambios: MU, V, AEM y ACN siguen pendientes de ejecución con sus niveles ya fijados.
+<b>Veredicto de Desarrollo:</b> fix prioritario del hallazgo #33 (Alta) — parseo NaN-inseguro en recomendaciones de analistas (datos_yfinance.py/datos_finnhub.py) que apaga el bloque completo y filtra un error técnico a la UI; además, separar mensaje de usuario y detalle técnico en errores de datos de mercado.
+Sesión completa: https://github.com/LornMalvo/comite-inversion-stockscanner/blob/main/comite_inversion/sesiones/2026-10-16_sesion.md
