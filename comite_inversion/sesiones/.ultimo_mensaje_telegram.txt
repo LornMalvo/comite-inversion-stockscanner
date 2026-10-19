@@ -1,5 +1,5 @@
-<b>Comité de Inversión — 2026-10-16</b>
-Candidatas tratadas: ninguna propuesta formalmente (28 tickers investigados y descartados: OR.PA, WEGE3.SA, ADM.L, CSL.AX, BAP, POW.TO, DHR, ANTO.L, HLN, ATD.TO, DOL.TO, CCJ, B3SA3 y otros 15 más)
-<b>Veredicto de Inversión:</b> ninguna (3ª sesión consecutiva sin candidata que cumpla calidad+valor+momentum). Cartera sin cambios: MU, V, AEM y ACN siguen pendientes de ejecución con sus niveles ya fijados.
-<b>Veredicto de Desarrollo:</b> fix prioritario del hallazgo #33 (Alta) — parseo NaN-inseguro en recomendaciones de analistas (datos_yfinance.py/datos_finnhub.py) que apaga el bloque completo y filtra un error técnico a la UI; además, separar mensaje de usuario y detalle técnico en errores de datos de mercado.
-Sesión completa: https://github.com/LornMalvo/comite-inversion-stockscanner/blob/main/comite_inversion/sesiones/2026-10-16_sesion.md
+<b>Comité de Inversión — 2026-10-19</b>
+Candidatas tratadas: PGR, INFY, FNV, CSGP, LRCX, WPM, CHKP, BNP.PA, PM, SHEL, PRU.L, BARC.L, AXA, ING, GLEN.L, TM, PAAS, CEG, ABBV, GILD, MTD, MO (22 tickers, ninguno llegó a Fase 3)
+<b>Veredicto de Inversión:</b> ninguna seleccionada (4ª sesión consecutiva sin candidata). Cada ángulo de entrada (calidad, valor, momentum) falló por el mismo patrón: calidad real con prima sin descuento (PGR, FNV, MTD), descuento aparente con ROE insuficiente (BNP.PA, BARC.L, AXA ~9-10%), o valor irreconciliable/ya incorporado al precio (PM, ING, MO, CEG, ABBV, GILD). Cartera sin cambios: MU, V, AEM, ACN siguen pendientes de ejecución.
+<b>Veredicto de Desarrollo:</b> 1) Fix hallazgo #34 (Media): Rastreador en vivo no reutiliza posiciones precalculadas, genera consultas N+1 a Supabase. 2) Nueva funcionalidad prioritaria: monitor automático de condiciones de watchlist/reconsideración (117+ tickers acumulados) con alertas Telegram cuando se cumplan.
+Sesión completa: https://github.com/LornMalvo/comite-inversion-stockscanner/blob/main/comite_inversion/sesiones/2026-10-19_sesion.md
