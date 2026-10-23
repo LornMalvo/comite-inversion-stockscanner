@@ -1,5 +1,5 @@
-<b>Comité de Inversión — 2026-10-21</b>
-Candidatas tratadas: TBCG.L (TBC Bank Group), y 23 tickers descartados por los 3 analistas (HLMA.L, DPLM.L, FAST, IDXX, RHM.DE, KOG.OL, BESI.AS, TSM, EMBR3, entre otros)
-<b>Veredicto de Inversión:</b> ninguna incorporada. TBCG.L (banco georgiano, ROE 23,5%, P/E ~5,9x) pasa a watchlist: precio de hoy no verificable con fuente única (~10% de discrepancia entre fuentes) y CET1 no localizado, pese a calidad genuina — no se fija entrada, soporte ni stop sin un precio fiable. MU, V, AEM y ACN siguen pendientes de ejecución sin cambios.
-<b>Veredicto de Desarrollo:</b> sin bugs nuevos (código sin cambios, 5ª confirmación consecutiva); dos mejoras de arquitectura propuestas: coerción numérica segura centralizada (previene la causa raíz de #24/#31/#33) y un backtest de las decisiones reales del comité reutilizando el motor ya existente del Rastreador.
-Sesión completa: https://github.com/LornMalvo/comite-inversion-stockscanner/blob/main/comite_inversion/sesiones/2026-10-21_sesion.md
+<b>Comité de Inversión — 2026-10-23</b>
+Candidatas tratadas: ninguna propuesta formalmente (18 tickers investigados y descartados: BBCA, 4063.T, EBS.VI, ICE, TTE, 1910.HK, 005380.KS, PRU, BT.A, GFNORTEO.MX, FSR.JSE, KBR, AMZN, META, WBD, VSNT, 8031.T, 8053.T)
+<b>Veredicto de Inversión:</b> ninguna. Ninguna candidata sostuvo calidad+valor+momentum simultáneamente (ROE/ROIC insuficiente, datos irreconciliables entre fuentes, o momentum ya agotado/negativo). MU, V, AEM y ACN siguen en cartera sin cambios, pendientes de ejecución.
+<b>Veredicto de Desarrollo:</b> sin bugs nuevos (código sin cambios, 6ª confirmación). Prioridad 1: importador de decisiones del comité al motor de backtest ya existente (core_rastreador.py). Prioridad 2: función entero_seguro() centralizada para cerrar el patrón NaN del hallazgo #33.
+Sesión completa: https://github.com/LornMalvo/comite-inversion-stockscanner/blob/main/comite_inversion/sesiones/2026-10-23_sesion.md
