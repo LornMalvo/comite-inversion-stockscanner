@@ -1,5 +1,5 @@
-<b>Comité de Inversión — 2026-10-23</b>
-Candidatas tratadas: ninguna propuesta formalmente (18 tickers investigados y descartados: BBCA, 4063.T, EBS.VI, ICE, TTE, 1910.HK, 005380.KS, PRU, BT.A, GFNORTEO.MX, FSR.JSE, KBR, AMZN, META, WBD, VSNT, 8031.T, 8053.T)
-<b>Veredicto de Inversión:</b> ninguna. Ninguna candidata sostuvo calidad+valor+momentum simultáneamente (ROE/ROIC insuficiente, datos irreconciliables entre fuentes, o momentum ya agotado/negativo). MU, V, AEM y ACN siguen en cartera sin cambios, pendientes de ejecución.
-<b>Veredicto de Desarrollo:</b> sin bugs nuevos (código sin cambios, 6ª confirmación). Prioridad 1: importador de decisiones del comité al motor de backtest ya existente (core_rastreador.py). Prioridad 2: función entero_seguro() centralizada para cerrar el patrón NaN del hallazgo #33.
-Sesión completa: https://github.com/LornMalvo/comite-inversion-stockscanner/blob/main/comite_inversion/sesiones/2026-10-23_sesion.md
+<b>Comité de Inversión — 2026-10-26</b>
+Candidatas tratadas: ACGL, VRSK, MRSH/MMC, IT, MSCI, SPGI, BKNG, ISP.MI, CB, TROW, CABK.MC, SCOR, CMCSA, MUFG, RIO, ESAB, NXT, 539551.BSE, TJX, KLAC, SAF (21 tickers, ninguno propuesto formalmente)
+<b>Veredicto de Inversión:</b> ninguna (6ª sesión sin candidata en las últimas 10). Ningún dato de entrada/stop aplica hoy. Cartera sin cambios: MU, V, AEM y ACN siguen pendientes de ejecución.
+<b>Veredicto de Desarrollo:</b> 1) Verificación cruzada de fundamentales con un 2º proveedor (Finnhub) para automatizar el "dato en disputa entre fuentes" que motiva la mayoría de los descartes recientes. 2) Corregir inconsistencia del MACD ante huecos de dato (hallazgo #35, Media).
+Sesión completa: https://github.com/LornMalvo/comite-inversion-stockscanner/blob/main/comite_inversion/sesiones/2026-10-26_sesion.md
