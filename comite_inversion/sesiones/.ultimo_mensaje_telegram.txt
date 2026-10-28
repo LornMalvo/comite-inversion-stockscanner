@@ -1,5 +1,5 @@
-<b>Comité de Inversión — 2026-10-26</b>
-Candidatas tratadas: ACGL, VRSK, MRSH/MMC, IT, MSCI, SPGI, BKNG, ISP.MI, CB, TROW, CABK.MC, SCOR, CMCSA, MUFG, RIO, ESAB, NXT, 539551.BSE, TJX, KLAC, SAF (21 tickers, ninguno propuesto formalmente)
-<b>Veredicto de Inversión:</b> ninguna (6ª sesión sin candidata en las últimas 10). Ningún dato de entrada/stop aplica hoy. Cartera sin cambios: MU, V, AEM y ACN siguen pendientes de ejecución.
-<b>Veredicto de Desarrollo:</b> 1) Verificación cruzada de fundamentales con un 2º proveedor (Finnhub) para automatizar el "dato en disputa entre fuentes" que motiva la mayoría de los descartes recientes. 2) Corregir inconsistencia del MACD ante huecos de dato (hallazgo #35, Media).
-Sesión completa: https://github.com/LornMalvo/comite-inversion-stockscanner/blob/main/comite_inversion/sesiones/2026-10-26_sesion.md
+<b>Comité de Inversión — 2026-10-28</b>
+Candidatas tratadas: ninguna llegó a Fase 3 (33 tickers investigados y descartados: ROP, AMAT, TTD, EFX, DECK, HDFCBANK.NS, NVS, MPWR, VALE, KER.PA, PBR, BIDU, SAN.PA, UNP, NESN.SW, ENEL.MI, STX, CRWD, FTNT, PANW, NVCR, VNDA, KALV, CORT, ARWR, ICICIBANK.NS, SHOP, ISRG, KVUE, RGLD, KGC)
+<b>Veredicto de Inversión:</b> ninguna; octava sesión sin candidata que sostenga calidad+valor+momentum con datos verificables. Convergencia de rechazo en HDFC Bank (los 3 analistas) y Novartis (2 analistas) por ROE/DCF irreconciliables entre fuentes. Cartera sin cambios: MU, V, AEM y ACN siguen pendientes de ejecución.
+<b>Veredicto de Desarrollo:</b> sin bugs nuevos (8ª confirmación de código sin cambios desde commit 48be6c2). Prioridad: nueva función exposicion_prospectiva() en core_cartera.py para detectar automáticamente el solapamiento sectorial/temático (oro, memoria/HBM) con posiciones pendientes de ejecución antes de aceptar una candidata.
+Sesión completa: https://github.com/LornMalvo/comite-inversion-stockscanner/blob/main/comite_inversion/sesiones/2026-10-28_sesion.md
