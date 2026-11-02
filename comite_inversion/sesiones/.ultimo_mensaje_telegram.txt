@@ -1,5 +1,5 @@
-<b>Comité de Inversión — 2026-10-30</b>
-Candidatas tratadas: ninguna llegó a Fase 3 (34 tickers investigados: LMT, RSG, CPKC, WM, NOC, GD, 0388.HK, AMT, LIN, EL.PA, HUM, DE, ADP, EQIX, PLD, EL, OXY, KHC, 1299.HK, FDX, CNR.TO, SCHW, PAYX, NSC, ROG.SW, CAT, ENR.DE, RTX, GS, AZN, TRV, ALB, ZURN, MSFT)
-<b>Veredicto de Inversión:</b> ninguna — ningún analista propuso candidata que sostenga calidad+valor+momentum con datos verificables. Dos convergencias de rechazo (0388.HK/HKEX y ADP, ambas por ROIC/Fair Value irreconciliables entre fuentes). Cartera sin cambios: MU, V, AEM y ACN siguen pendientes de ejecución.
-<b>Veredicto de Desarrollo:</b> 1) exposicion_prospectiva() en core_cartera.py para detectar solapamiento sectorial con posiciones pendientes antes de aceptar una candidata (prioridad alta); 2) soporte de divisas realmente internacional (CARTERA_DIVISAS_CONVERTIBLES), motivado por las candidatas de hoy en HKD.
-Sesión completa: https://github.com/LornMalvo/comite-inversion-stockscanner/blob/main/comite_inversion/sesiones/2026-10-30_sesion.md
+<b>Comité de Inversión — 2026-11-02</b>
+Candidatas tratadas: ninguna llegó a Fase 3 (27 tickers investigados: FPH, D05.SI, 1120.SR, CPALL.BK, S68.SI, Capitec, FPT, PKO.WA, WALMEX, GLOB, SQM, ATCO A, Galaxy Ent., Sands China, TD, Marubeni, Generali, Vinamilk, Banco de Chile, QNB, Bancolombia, Hanwha Aero, Nat. Bank of Greece, Piraeus, BBRI, Sony, FAB)
+<b>Veredicto de Inversión:</b> ninguna (décima sesión sin candidata en 13). Convergencia triple: Capitec Bank rechazada por los 3 analistas (Fair Value contradictorio dentro de la misma fuente). Cartera sin cambios: MU, V, AEM, ACN pendientes de ejecución.
+<b>Veredicto de Desarrollo:</b> cero bugs nuevos (décima confirmación sin cambios de código). Propuesta aprobada: alerta de noticias materiales para posiciones abiertas (cableando Finnhub ya existente a core_alertas.py).
+Sesión completa: https://github.com/LornMalvo/comite-inversion-stockscanner/blob/main/comite_inversion/sesiones/2026-11-02_sesion.md
