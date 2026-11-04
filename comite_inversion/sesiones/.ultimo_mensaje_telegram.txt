@@ -1,5 +1,5 @@
-<b>Comité de Inversión — 2026-11-02</b>
-Candidatas tratadas: ninguna llegó a Fase 3 (27 tickers investigados: FPH, D05.SI, 1120.SR, CPALL.BK, S68.SI, Capitec, FPT, PKO.WA, WALMEX, GLOB, SQM, ATCO A, Galaxy Ent., Sands China, TD, Marubeni, Generali, Vinamilk, Banco de Chile, QNB, Bancolombia, Hanwha Aero, Nat. Bank of Greece, Piraeus, BBRI, Sony, FAB)
-<b>Veredicto de Inversión:</b> ninguna (décima sesión sin candidata en 13). Convergencia triple: Capitec Bank rechazada por los 3 analistas (Fair Value contradictorio dentro de la misma fuente). Cartera sin cambios: MU, V, AEM, ACN pendientes de ejecución.
-<b>Veredicto de Desarrollo:</b> cero bugs nuevos (décima confirmación sin cambios de código). Propuesta aprobada: alerta de noticias materiales para posiciones abiertas (cableando Finnhub ya existente a core_alertas.py).
-Sesión completa: https://github.com/LornMalvo/comite-inversion-stockscanner/blob/main/comite_inversion/sesiones/2026-11-02_sesion.md
+<b>Comité de Inversión — 2026-11-04</b>
+Candidatas tratadas: ninguna llegó a Fase 3 (17 tickers investigados: ULTA, WST, COST, ROST, FND, MLM, VMC, ITUB, WRB, 8766.T, NTES, DAR, RNG, ZBRA, GWW, AGYS, VIK)
+<b>Veredicto de Inversión:</b> ninguna seleccionada. Esperar. Sin precio de entrada ni stops (no hay candidata). Cartera sin cambios: MU, V, AEM y ACN siguen pendientes de ejecución.
+<b>Veredicto de Desarrollo:</b> cero bugs nuevos (11ª confirmación de código sin cambios). Prioridad: migrar el registro de exclusión empresas_analizadas.md (ya 295 líneas) a una tabla Supabase consultable, con funciones ya_analizada()/registrar_empresa_analizada() en db_supabase.py.
+Sesión completa: https://github.com/LornMalvo/comite-inversion-stockscanner/blob/main/comite_inversion/sesiones/2026-11-04_sesion.md
