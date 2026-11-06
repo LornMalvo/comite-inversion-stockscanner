@@ -1,5 +1,5 @@
-<b>Comité de Inversión — 2026-11-04</b>
-Candidatas tratadas: ninguna llegó a Fase 3 (17 tickers investigados: ULTA, WST, COST, ROST, FND, MLM, VMC, ITUB, WRB, 8766.T, NTES, DAR, RNG, ZBRA, GWW, AGYS, VIK)
-<b>Veredicto de Inversión:</b> ninguna seleccionada. Esperar. Sin precio de entrada ni stops (no hay candidata). Cartera sin cambios: MU, V, AEM y ACN siguen pendientes de ejecución.
-<b>Veredicto de Desarrollo:</b> cero bugs nuevos (11ª confirmación de código sin cambios). Prioridad: migrar el registro de exclusión empresas_analizadas.md (ya 295 líneas) a una tabla Supabase consultable, con funciones ya_analizada()/registrar_empresa_analizada() en db_supabase.py.
-Sesión completa: https://github.com/LornMalvo/comite-inversion-stockscanner/blob/main/comite_inversion/sesiones/2026-11-04_sesion.md
+<b>Comité de Inversión — 2026-11-06</b>
+Candidatas tratadas: MKL, AI.PA, NZYM-B.CO, MONC.MI, 6273.T, STMN.SW, ITX.MC, 6954.T, HEN3.DE, COLO-B.CO, ULVR.L, CL, RAA, ROAD, LDO.MI, MANH
+<b>Veredicto de Inversión:</b> ninguna (16 candidatas investigadas, ninguna cumple calidad+valor+momentum). Rational AG (RAA) y Manhattan Associates (MANH) fueron las más cercanas pero sin margen de seguridad verificable. Cartera sin cambios: MU, V, AEM y ACN siguen pendientes de ejecución.
+<b>Veredicto de Desarrollo:</b> cero cambios de código (13ª confirmación); se propone con pseudocódigo completo una vigilancia activa de invalidación de tesis (cierra hallazgo #30) para automatizar el stop fundamental de las posiciones en cartera.
+Sesión completa: https://github.com/LornMalvo/comite-inversion-stockscanner/blob/main/comite_inversion/sesiones/2026-11-06_sesion.md
