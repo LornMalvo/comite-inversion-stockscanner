@@ -1,5 +1,5 @@
-<b>Comité de Inversión — 2026-11-06</b>
-Candidatas tratadas: MKL, AI.PA, NZYM-B.CO, MONC.MI, 6273.T, STMN.SW, ITX.MC, 6954.T, HEN3.DE, COLO-B.CO, ULVR.L, CL, RAA, ROAD, LDO.MI, MANH
-<b>Veredicto de Inversión:</b> ninguna (16 candidatas investigadas, ninguna cumple calidad+valor+momentum). Rational AG (RAA) y Manhattan Associates (MANH) fueron las más cercanas pero sin margen de seguridad verificable. Cartera sin cambios: MU, V, AEM y ACN siguen pendientes de ejecución.
-<b>Veredicto de Desarrollo:</b> cero cambios de código (13ª confirmación); se propone con pseudocódigo completo una vigilancia activa de invalidación de tesis (cierra hallazgo #30) para automatizar el stop fundamental de las posiciones en cartera.
-Sesión completa: https://github.com/LornMalvo/comite-inversion-stockscanner/blob/main/comite_inversion/sesiones/2026-11-06_sesion.md
+<b>Comité de Inversión — 2026-11-09</b>
+Candidatas tratadas: ninguna cumplió la triple condición (26 tickers investigados: AZO, MNST, ALGN, ORLY, RL, WAT, CHD, GRMN, BDX, MSI, ALV.DE, IMB.L, SAN.MC, 8316.T, 2914.T, GEN, PNR, SOLS, SNDK, WDC, APP, HOOD, 055550.KS, 086790.KS, NU, GRAB)
+<b>Veredicto de Inversión:</b> ninguna; cartera sin cambios (MU, V, AEM, ACN pendientes de ejecución, sin datos nuevos que alteren sus tesis)
+<b>Veredicto de Desarrollo:</b> 1) corregir hallazgo nuevo #37 (Alta): Deuda/Patrimonio negativo satura la nota de Calidad de StockScanner a 100/100 en vez de señalar insolvencia; 2) gate de solvencia explícito en core_calidad.py para alertar patrimonio neto negativo
+Sesión completa: https://github.com/LornMalvo/comite-inversion-stockscanner/blob/main/comite_inversion/sesiones/2026-11-09_sesion.md
