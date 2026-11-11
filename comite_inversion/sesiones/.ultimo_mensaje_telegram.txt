@@ -1,5 +1,5 @@
-<b>Comité de Inversión — 2026-11-09</b>
-Candidatas tratadas: ninguna cumplió la triple condición (26 tickers investigados: AZO, MNST, ALGN, ORLY, RL, WAT, CHD, GRMN, BDX, MSI, ALV.DE, IMB.L, SAN.MC, 8316.T, 2914.T, GEN, PNR, SOLS, SNDK, WDC, APP, HOOD, 055550.KS, 086790.KS, NU, GRAB)
-<b>Veredicto de Inversión:</b> ninguna; cartera sin cambios (MU, V, AEM, ACN pendientes de ejecución, sin datos nuevos que alteren sus tesis)
-<b>Veredicto de Desarrollo:</b> 1) corregir hallazgo nuevo #37 (Alta): Deuda/Patrimonio negativo satura la nota de Calidad de StockScanner a 100/100 en vez de señalar insolvencia; 2) gate de solvencia explícito en core_calidad.py para alertar patrimonio neto negativo
-Sesión completa: https://github.com/LornMalvo/comite-inversion-stockscanner/blob/main/comite_inversion/sesiones/2026-11-09_sesion.md
+<b>Comité de Inversión — 2026-11-11</b>
+Candidatas tratadas: ninguna llegó a Fase 3 (39 tickers investigados y descartados, incl. convergencia en AMX)
+<b>Veredicto de Inversión:</b> ninguna; no hay precio de entrada ni stops porque no hay candidata. Cartera sin cambios (MU, V, AEM, ACN pendientes de ejecución)
+<b>Veredicto de Desarrollo:</b> 1) Prioridad Alta: gate de cobertura mínima para notas de Timing/Fair Value (hallazgo #38, nota "completa" reproducida con solo 4% de cobertura real). 2) Prioridad Alta: corregir corrupción de tickers con sufijo bursátil no occidental (#20, ampliado)
+Sesión completa: https://github.com/LornMalvo/comite-inversion-stockscanner/blob/main/comite_inversion/sesiones/2026-11-11_sesion.md
