@@ -1,5 +1,5 @@
-<b>Comité de Inversión — 2026-11-11</b>
-Candidatas tratadas: ninguna llegó a Fase 3 (39 tickers investigados y descartados, incl. convergencia en AMX)
-<b>Veredicto de Inversión:</b> ninguna; no hay precio de entrada ni stops porque no hay candidata. Cartera sin cambios (MU, V, AEM, ACN pendientes de ejecución)
-<b>Veredicto de Desarrollo:</b> 1) Prioridad Alta: gate de cobertura mínima para notas de Timing/Fair Value (hallazgo #38, nota "completa" reproducida con solo 4% de cobertura real). 2) Prioridad Alta: corregir corrupción de tickers con sufijo bursátil no occidental (#20, ampliado)
-Sesión completa: https://github.com/LornMalvo/comite-inversion-stockscanner/blob/main/comite_inversion/sesiones/2026-11-11_sesion.md
+<b>Comité de Inversión — 2026-11-13</b>
+Candidatas tratadas: NVR, BRO, CTAS, ROL, SHW, GGG, APD, C, COP, PFE, GM, VZ, ORCL, GE, UBER, NFLX
+<b>Veredicto de Inversión:</b> ninguna. Los 16 tickers investigados fallan por ROIC/DCF irreconciliable entre proveedores, ausencia de descuento real o ROIC insuficiente/negativo. Cartera sin cambios (MU, V, AEM, ACN pendientes de ejecución).
+<b>Veredicto de Desarrollo:</b> 1) Aprobar `core_screener.candidatas_automaticas()`: preselecciona tickers reutilizando las notas ya existentes de Calidad/Fair Value/Timing, en vez de que los analistas elijan a mano (16/16 fallaron hoy). 2) Implementar `COBERTURA_MINIMA_FIABLE` (hallazgo #38), prerrequisito del screener.
+Sesión completa: https://github.com/LornMalvo/comite-inversion-stockscanner/blob/main/comite_inversion/sesiones/2026-11-13_sesion.md
