@@ -1,5 +1,5 @@
-<b>Comité de Inversión — 2026-11-13</b>
-Candidatas tratadas: NVR, BRO, CTAS, ROL, SHW, GGG, APD, C, COP, PFE, GM, VZ, ORCL, GE, UBER, NFLX
-<b>Veredicto de Inversión:</b> ninguna. Los 16 tickers investigados fallan por ROIC/DCF irreconciliable entre proveedores, ausencia de descuento real o ROIC insuficiente/negativo. Cartera sin cambios (MU, V, AEM, ACN pendientes de ejecución).
-<b>Veredicto de Desarrollo:</b> 1) Aprobar `core_screener.candidatas_automaticas()`: preselecciona tickers reutilizando las notas ya existentes de Calidad/Fair Value/Timing, en vez de que los analistas elijan a mano (16/16 fallaron hoy). 2) Implementar `COBERTURA_MINIMA_FIABLE` (hallazgo #38), prerrequisito del screener.
-Sesión completa: https://github.com/LornMalvo/comite-inversion-stockscanner/blob/main/comite_inversion/sesiones/2026-11-13_sesion.md
+<b>Comité de Inversión — 2026-11-16</b>
+Candidatas tratadas: ninguna llegó a Fase 3 (23 tickers investigados y descartados: ITW, AME, FDS, A, PSA, AON, WTW, TER, GSK, CSX, ENTG, MKTX, CBOE, ALL, BRBY.L, ADS.DE, SAAB-B.ST, KBC.BR, 8035.T, BEZ.L, LYC.AX, CPG.L, MRVL)
+<b>Veredicto de Inversión:</b> ninguna seleccionada. Patrón de siempre: calidad real sin descuento (ITW, Saab), Fair Value/ROIC irreconciliable entre fuentes (FactSet, GSK, Cboe, KBC), o caída reciente que es deterioro, no oportunidad (Lynas, Marvell). Convergencia de rechazo en Entegris (Analista 2 y 3). Cartera sin cambios: MU, V, AEM, ACN siguen pendientes de ejecución con sus stops ya fijados.
+<b>Veredicto de Desarrollo:</b> 1) Corregir hallazgo #39 (Media): listar_screener() no relee la cobertura de Fair Value/Timing que sí se persiste. 2) Aprobar diseño abaratado de core_screener.candidatas_automaticas() (reutiliza el cron nocturno sin coste extra) para preseleccionar candidatas en vez de elegir tickers a mano.
+Sesión completa: https://github.com/LornMalvo/comite-inversion-stockscanner/blob/main/comite_inversion/sesiones/2026-11-16_sesion.md
